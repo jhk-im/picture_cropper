@@ -40,7 +40,7 @@ import 'package:picture_cropper/picture_cropper.dart';
 ### iOS Configuration
 Add the following keys to your Info.plist file:
 
-```plist
+```xml
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Describe why your app needs access to the photo library</string>
 <key>NSCameraUsageDescription</key>
@@ -51,7 +51,7 @@ Add the following keys to your Info.plist file:
 
 Or in text format add the key:
 
-``` xml
+```xml
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Used to demonstrate image picker plugin</string>
 <key>NSCameraUsageDescription</key>
