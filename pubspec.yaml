@@ -1,0 +1,23 @@
+name: picture_cropper
+description: Flutter package for capturing and cropping photos from camera or gallery.
+version: 0.0.1
+homepage: https://github.com/jhk_im/picture_cropper
+repository: https://github.com/jhk_im/picture_cropper
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image: ^4.2.0
+  camera: ^0.11.0+1
+  image_picker: ^1.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lints: ^3.0.0
+  test: ^1.24.0
+
+flutter:
