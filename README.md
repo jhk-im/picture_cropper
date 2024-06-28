@@ -24,21 +24,30 @@ A Flutter package for cropping pictures, which includes features for capturing i
 
 ## Installation
 
-First, add `picture_cropper:` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
+To use Picture Cropper in your Flutter project, add picture_cropper as a dependency in your pubspec.yaml file.
 
-Import
+```yaml
+dependencies:
+  picture_cropper: ^latest_version
+```
+
+Import it in your Dart code:
 
 ```dart
 import 'package:picture_cropper/picture_cropper.dart';
 ```
 
-### iOS
+### iOS Configuration
+Add the following keys to your Info.plist file:
 
-Add the following keys to your _Info.plist_ file, located in `<project root>/ios/Runner/Info.plist`:
-
-* `NSPhotoLibraryUsageDescription` - describe why your app needs permission for the photo library. This is called _Privacy - Photo Library Usage Description_ in the visual editor.
-* `NSCameraUsageDescription` - describe why your app needs access to the camera. This is called _Privacy - Camera Usage Description_ in the visual editor.
-* `NSMicrophoneUsageDescription` - describe why your app needs access to the microphone, if you intend to record videos. This is called _Privacy - Microphone Usage Description_ in the visual editor.
+```plist
+<key>NSPhotoLibraryUsageDescription</key>
+<string>Describe why your app needs access to the photo library</string>
+<key>NSCameraUsageDescription</key>
+<string>Describe why your app needs access to the camera</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>Describe why your app needs access to the microphone (if applicable)</string>
+```
 
 Or in text format add the key:
 
@@ -53,7 +62,7 @@ Or in text format add the key:
 
 ### Android
 
-No configuration required - the plugin should work out of the box.
+No additional configuration required.
 
 ### Example - Capturing or Selecting an Image from the Gallery
 
@@ -75,7 +84,6 @@ void initState() {
 
 @override
 void dispose() {
-  // pictureEditorControllerDispose() 실행
   pictureEditorController.pictureEditorControllerDispose();
   super.dispose();
 }
@@ -140,8 +148,8 @@ Widget build(BuildContext context) {
 ```
 ```dart
 // Method - toggleIrregularCrop
-// true = Irregular Crop
 // false = Ractangle Crop
+// true = Irregular Crop
 InkWell(
   onTap: () async {
     setState(() {
