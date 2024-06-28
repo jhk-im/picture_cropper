@@ -7,20 +7,17 @@ A Flutter package for cropping pictures, which includes features for capturing i
 
 ### Rectangle Crop
 <p>  
-  <img src="./readme/guide_02.png" width="200" height="400"/>
-  <img src="./readme/crop_01.png" width="200" height="400"/>
-  <img src="./readme/result_01.png" width="200" height="400"/>
-
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_01.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_02.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_03.png?raw=true" width="200" height="400"/>
 </p>
 
 ### Irregurlar Crop
 <p>  
-  <img src="./readme/guide_01.png" width="200" height="400"/>
-  <img src="./readme/crop_00.png" width="200" height="400"/>
-  <img src="./readme/crop_03.png" width="200" height="400"/>
-  <img src="./readme/result_02.png" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_04.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_05.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_06.png?raw=true" width="200" height="400"/>
 </p>
-
 
 ## Installation
 
