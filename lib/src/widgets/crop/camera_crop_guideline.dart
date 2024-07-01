@@ -7,14 +7,14 @@ import 'crop_area_clipper.dart';
 typedef UpdatePicturePathItem = Function(PicturePathItem);
 
 class CameraCropGuideline extends StatefulWidget {
-  final PictureCropGuideType cropGuideType;
+  final PictureCropGuideLineType cropGuideLineType;
   final double radius;
   final double margin;
   final Color backgroundColor;
   final UpdatePicturePathItem onUpdatePicturePathItem;
 
   const CameraCropGuideline({
-    required this.cropGuideType,
+    required this.cropGuideLineType,
     required this.radius,
     required this.margin,
     required this.backgroundColor,
@@ -55,7 +55,7 @@ class CameraCropGuidelineState extends State<CameraCropGuideline> {
     double right = 0;
     double bottom = 0;
 
-    if (widget.cropGuideType != PictureCropGuideType.card) {
+    if (widget.cropGuideLineType != PictureCropGuideLineType.card) {
       double qrWidth = width - (widget.margin * 2);
       left = widget.margin;
       right = width - widget.margin;
@@ -88,7 +88,7 @@ class CameraCropGuidelineState extends State<CameraCropGuideline> {
   @override
   void didUpdateWidget(CameraCropGuideline oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.cropGuideType != oldWidget.cropGuideType) {
+    if (widget.cropGuideLineType != oldWidget.cropGuideLineType) {
       _setScannerCropGuideline();
     }
   }
@@ -99,7 +99,7 @@ class CameraCropGuidelineState extends State<CameraCropGuideline> {
       key: _stackKey,
       children: [
         Visibility(
-          visible: widget.cropGuideType != PictureCropGuideType.clear,
+          visible: widget.cropGuideLineType != PictureCropGuideLineType.clear,
           child: IgnorePointer(
             child: ClipPath(
               clipper: CropAreaClipper(_picturePathItem, radius: widget.radius),

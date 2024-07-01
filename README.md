@@ -71,7 +71,7 @@ late PictureEditorController pictureEditorController;
 @override
 void initState() {
   super.initState();
-  pictureEditorController = PictureEditorControllerFactory.createController(
+  pictureEditorController = PictureCropperController(
     onSelectedImage: (Uint8List image) {
       // Callback after capturing or selecting an image
       // If you need image bytes...
@@ -132,7 +132,7 @@ InkWell(
 ### Example - Editing Image Crop Area
 
 ```dart
-final pictureEditorController = PictureEditorControllerFactory.createController();
+final pictureCropperController = PictureCropperController();
 
 @override
 Widget build(BuildContext context) {
@@ -148,7 +148,7 @@ Widget build(BuildContext context) {
 // false = Ractangle Crop
 // true = Irregular Crop
 InkWell(
-  onTap: () async {
+    onTap: () async {
     setState(() {
       pictureEditorController.toggleIrregularCrop(false);
       _isIrregularCrop = false;
@@ -165,7 +165,7 @@ InkWell(
 ### Example -  Cropping Image
 
 ```dart
-final pictureEditorController = PictureEditorControllerFactory.createController();
+final pictureCropperController = PictureCropperController();
 
 @override
 Widget build(BuildContext context) {

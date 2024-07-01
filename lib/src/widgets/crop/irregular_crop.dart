@@ -7,7 +7,6 @@ import 'crop_area_clipper.dart';
 import 'crop_control_point.dart';
 
 class IrregularCrop extends StatelessWidget {
-  final Clip clipBehavior;
   final double width;
   final double height;
   final Color backgroundColor;
@@ -17,7 +16,6 @@ class IrregularCrop extends StatelessWidget {
 
   IrregularCrop({
     super.key,
-    required this.clipBehavior,
     required this.width,
     required this.height,
     required this.backgroundColor,
@@ -46,13 +44,13 @@ class IrregularCrop extends StatelessWidget {
     );
 
     if (isToggled) {
-      final controller = PictureCropperControllerFactory.createController();
-      controller.setPicturePathItem(initCropItem);
+      final controller = PictureCropperController();
+      controller.updatePicturePathItem(initCropItem);
     }
 
     return _IrregularCorpEditor(
       onUpdateCrop: onUpdatePicturePathItem,
-      clipBehavior: clipBehavior,
+      clipBehavior: Clip.hardEdge,
       initCropItem: picturePathItem == null || isToggled
           ? initCropItem
           : picturePathItem!,

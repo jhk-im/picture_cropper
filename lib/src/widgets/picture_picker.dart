@@ -4,18 +4,24 @@ import 'package:camera/camera.dart';
 import '../controllers/picture_cropper_controller.dart';
 import 'crop/camera_crop_guideline.dart';
 
+/// [PicturePicker] is a widget used for taking photos and picking images from the gallery.
+/// It is recommended to use a stateful widget to ensure the camera direction toggle method functions correctly.
+/// The [controller] is used for taking photos, accessing the gallery, camera direction toggle, and changing the shooting guidelines.
+/// [guideLineRadius] sets the radius of the shooting guideline.
+/// [guideLineMargin] sets the margin of the shooting guideline.
+/// [guideLineBackgroundColor] sets the background color of the shooting guideline.
 class PicturePicker extends StatefulWidget {
   final PictureCropperController controller;
-  final double radius;
-  final double margin;
-  final Color? cropBackgroundColor;
+  final double guideLineRadius;
+  final double guideLineMargin;
+  final Color? guideLineBackgroundColor;
 
   const PicturePicker({
     super.key,
     required this.controller,
-    this.radius = 8,
-    this.margin = 16,
-    this.cropBackgroundColor,
+    this.guideLineRadius = 8,
+    this.guideLineMargin = 16,
+    this.guideLineBackgroundColor,
   });
 
   @override
@@ -43,13 +49,13 @@ class _PicturePickerState extends State<PicturePicker> {
                     : Container(),
               ),
               CameraCropGuideline(
-                cropGuideType: widget.controller.cropGuideType,
-                radius: widget.radius,
-                margin: widget.margin,
+                cropGuideLineType: widget.controller.cropGuideType,
+                radius: widget.guideLineRadius,
+                margin: widget.guideLineMargin,
                 backgroundColor:
-                    widget.cropBackgroundColor ?? Colors.black.withAlpha(180),
+                    widget.guideLineBackgroundColor ?? Colors.black.withAlpha(180),
                 onUpdatePicturePathItem: (picturePathItem) {
-                  widget.controller.setPicturePathItem(picturePathItem);
+                  widget.controller.updatePicturePathItem(picturePathItem);
                 },
               ),
             ],

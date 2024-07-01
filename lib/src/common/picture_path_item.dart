@@ -1,3 +1,5 @@
+/// [PicturePathItem] includes the coordinate information, scale, and rotation data for cropping and guidelines.
+/// It is used only within the package.
 class PicturePathItem {
   PicturePathItem({
     this.leftTopX = 0,

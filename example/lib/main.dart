@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    pictureCropperController = PictureCropperControllerFactory.createController(
+    pictureCropperController = PictureCropperController(
       onSelectedImage: (Uint8List image) {
         setState(() {
           Navigator.pushNamed(context, '/editor');
@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       setState(() {
                         _cropStatus = 0;
                         pictureCropperController
-                            .changeCropGuideLineType(PictureCropGuideType.qr);
+                            .changeCropGuideLineType(PictureCropGuideLineType.qr);
                       });
                     },
                     child: Icon(
@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       setState(() {
                         _cropStatus = 1;
                         pictureCropperController
-                            .changeCropGuideLineType(PictureCropGuideType.card);
+                            .changeCropGuideLineType(PictureCropGuideLineType.card);
                       });
                     },
                     child: Icon(
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       setState(() {
                         _cropStatus = 2;
                         pictureCropperController.changeCropGuideLineType(
-                            PictureCropGuideType.clear);
+                            PictureCropGuideLineType.clear);
                       });
                     },
                     child: Icon(

@@ -2,9 +2,13 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:picture_cropper/src/common/picture_path_item.dart';
 
 import '../../picture_cropper.dart';
 
+/// [PictureCrop] is a widget that displays the edited image as a [ui.Image] from [PictureEditor].
+/// The [controller] is used to access the original image bytes and crop path information.
+/// [onCropped] is used when the final [ui.Image] is needed.
 class PictureCrop extends StatefulWidget {
   final PictureCropperController controller;
   final void Function(ui.Image) onCropped;
@@ -70,10 +74,10 @@ class _PictureCropState extends State<PictureCrop> {
     );
   }
 
+  /// This method converts [Uint8List] bytes to a [ui.Image].
   Future<ui.Image> _loadImage(Uint8List img, double scale) async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(img, (ui.Image image) async {
-      // 스케일 적용
       final recorder = ui.PictureRecorder();
       final Canvas canvas = Canvas(recorder);
 
@@ -95,6 +99,7 @@ class _PictureCropState extends State<PictureCrop> {
     return completer.future;
   }
 
+  /// It redraws the converted [ui.Image] to fit the crop coordinates size of [PicturePathItem].
   Future<ui.Image> _getImageFromCustomPainter(
     ui.Image image,
   ) async {
@@ -102,7 +107,7 @@ class _PictureCropState extends State<PictureCrop> {
     final Canvas canvas = Canvas(recorder,
         Rect.fromLTWH(0, 0, _renderBoxSize.width, _renderBoxSize.height));
 
-    final CropPainter painter = CropPainter(image,
+    final _CropPainter painter = _CropPainter(image,
         widget.controller.picturePathItem.scale, _cropPath, _renderBoxSize);
     painter.paint(canvas, _renderBoxSize);
 
@@ -129,13 +134,18 @@ class _PictureCropState extends State<PictureCrop> {
   }
 }
 
-class CropPainter extends CustomPainter {
+/// [_CropPainter] is a custom painter used for drawing an image with crop path applied.
+/// [image] is an Image created from [Uint8List] bytes.
+/// [scale] is the information about Zoom in and Zoom out during editing.
+/// [cropPath] is the coordinate information for the crop.
+/// [renderBoxSize] is the size of the drawn image.
+class _CropPainter extends CustomPainter {
   final ui.Image image;
   final double scale;
   final Path cropPath;
   final Size renderBoxSize;
 
-  CropPainter(this.image, this.scale, this.cropPath, this.renderBoxSize);
+  _CropPainter(this.image, this.scale, this.cropPath, this.renderBoxSize);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -154,10 +164,8 @@ class CropPainter extends CustomPainter {
 
     final Path transformedPath = cropPath.transform(Matrix4.identity().storage);
 
-    // Save the current canvas state
     canvas.save();
 
-    // Clip the canvas to the path
     canvas.clipPath(transformedPath);
 
     final Rect srcRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
@@ -165,7 +173,6 @@ class CropPainter extends CustomPainter {
         Rect.fromLTWH(offsetX, offsetY, scaledImageWidth, scaledImageHeight);
     canvas.drawImageRect(image, srcRect, dstRect, Paint());
 
-    // Restore the canvas to remove the clipping
     canvas.restore();
   }
 

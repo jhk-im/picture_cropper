@@ -9,8 +9,7 @@ class EditorPage extends StatefulWidget {
 }
 
 class _EditorPageState extends State<EditorPage> {
-  final pictureCropperController =
-      PictureCropperControllerFactory.createController();
+  final pictureCropperController = PictureCropperController();
   bool _isIrregularCrop = false;
 
   @override
@@ -19,7 +18,7 @@ class _EditorPageState extends State<EditorPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            PictureProEditor(controller: pictureCropperController),
+            PictureEditor(controller: pictureCropperController),
             Container(
               alignment: Alignment.topCenter,
               padding: const EdgeInsets.all(24),

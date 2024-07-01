@@ -4,23 +4,24 @@ import '../../picture_cropper.dart';
 import 'crop/irregular_crop.dart';
 import 'crop/rectangle_crop.dart';
 
-class PictureProEditor extends StatefulWidget {
+/// [PictureEditor] is a widget used to edit the coordinates for cropping.
+/// The [controller] is used to determine the crop type and access the crop path.
+/// [cropBackgroundColor] determines the background color during cropping.
+class PictureEditor extends StatefulWidget {
   final PictureCropperController controller;
-  final Clip clipBehavior;
   final Color? cropBackgroundColor;
 
-  const PictureProEditor({
+  const PictureEditor({
     super.key,
     required this.controller,
-    this.clipBehavior = Clip.hardEdge,
     this.cropBackgroundColor,
   });
 
   @override
-  State<PictureProEditor> createState() => _PictureProEditorState();
+  State<PictureEditor> createState() => _PictureEditorState();
 }
 
-class _PictureProEditorState extends State<PictureProEditor> {
+class _PictureEditorState extends State<PictureEditor> {
   final GlobalKey _stackKey = GlobalKey();
   Size? _size;
   double _scale = 1.0;
@@ -75,7 +76,6 @@ class _PictureProEditorState extends State<PictureProEditor> {
           if (_size != null) ...{
             widget.controller.isIrregularCrop
                 ? IrregularCrop(
-                    clipBehavior: widget.clipBehavior,
                     width: _size?.width ?? 0,
                     height: _size?.height ?? 0,
                     picturePathItem: widget.controller.picturePathItem,
@@ -84,11 +84,10 @@ class _PictureProEditorState extends State<PictureProEditor> {
                     isToggled: widget.controller.isToggled,
                     onUpdatePicturePathItem: (cropAreaClipItem) {
                       cropAreaClipItem.scale = _scale;
-                      widget.controller.setPicturePathItem(cropAreaClipItem);
+                      widget.controller.updatePicturePathItem(cropAreaClipItem);
                     },
                   )
                 : RectangleCrop(
-                    clipBehavior: widget.clipBehavior,
                     width: _size?.width ?? 0,
                     height: _size?.height ?? 0,
                     picturePathItem: widget.controller.picturePathItem,
@@ -97,7 +96,7 @@ class _PictureProEditorState extends State<PictureProEditor> {
                     isToggled: widget.controller.isToggled,
                     onUpdatePicturePathItem: (cropAreaClipItem) {
                       cropAreaClipItem.scale = _scale;
-                      widget.controller.setPicturePathItem(cropAreaClipItem);
+                      widget.controller.updatePicturePathItem(cropAreaClipItem);
                     },
                   ),
           }

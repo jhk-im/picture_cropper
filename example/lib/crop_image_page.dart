@@ -16,7 +16,7 @@ class CropImagePage extends StatefulWidget {
 }
 
 class _CropImagePageState extends State<CropImagePage> {
-  late PictureCropperController pictureCropperController;
+  PictureCropperController pictureCropperController = PictureCropperController();
   ui.Image? _image;
 
   Future<void> saveImage() async {
@@ -44,13 +44,6 @@ class _CropImagePageState extends State<CropImagePage> {
     } catch (e) {
       print(e);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    pictureCropperController =
-        PictureCropperControllerFactory.createController();
   }
 
   @override
