@@ -1,3 +1,6 @@
+## 0.0.4
+-  Update readme file, documentation
+
 ## 0.0.3
 - Fix image url in README.md
 
