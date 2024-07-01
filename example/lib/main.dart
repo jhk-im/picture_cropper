@@ -78,8 +78,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 0;
-                        pictureCropperController
-                            .changeCropGuideLineType(PictureCropGuideLineType.qr);
+                        pictureCropperController.changeCropGuideLineType(
+                            PictureCropGuideLineType.qr);
                       });
                     },
                     child: Icon(
@@ -92,8 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 1;
-                        pictureCropperController
-                            .changeCropGuideLineType(PictureCropGuideLineType.card);
+                        pictureCropperController.changeCropGuideLineType(
+                            PictureCropGuideLineType.card);
                       });
                     },
                     child: Icon(

@@ -52,8 +52,8 @@ class _PicturePickerState extends State<PicturePicker> {
                 cropGuideLineType: widget.controller.cropGuideType,
                 radius: widget.guideLineRadius,
                 margin: widget.guideLineMargin,
-                backgroundColor:
-                    widget.guideLineBackgroundColor ?? Colors.black.withAlpha(180),
+                backgroundColor: widget.guideLineBackgroundColor ??
+                    Colors.black.withAlpha(180),
                 onUpdatePicturePathItem: (picturePathItem) {
                   widget.controller.updatePicturePathItem(picturePathItem);
                 },

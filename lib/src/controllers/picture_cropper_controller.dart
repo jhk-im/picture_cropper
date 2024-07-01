@@ -11,7 +11,6 @@ import '../common/picture_path_item.dart';
 /// This class includes methods for camera shooting, gallery picking, and editing.
 /// It is mandatory to use it in [PicturePicker], [PictureEditor], and [PictureCrop] widgets.
 class PictureCropperController extends ChangeNotifier {
-
   /// [onSelectedImage] callback is used only in the [PicturePicker] widget.
   /// If the callback is provided outside of [PicturePicker], the [cameraController] will be unnecessarily initialized.
   PictureCropperController({this.onSelectedImage}) {
@@ -50,7 +49,7 @@ class PictureCropperController extends ChangeNotifier {
     }
     final cameras = await availableCameras();
     final cameraDescription = cameras.firstWhere(
-          (description) => description.lensDirection == _direction,
+      (description) => description.lensDirection == _direction,
     );
     _cameraController = CameraController(
       cameraDescription,
