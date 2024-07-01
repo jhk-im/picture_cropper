@@ -1,3 +1,6 @@
+## 0.0.5
+-  dart format .
+
 ## 0.0.4
 -  Update readme file, documentation
 
