@@ -29,7 +29,6 @@ class PicturePicker extends StatefulWidget {
 }
 
 class _PicturePickerState extends State<PicturePicker> {
-
   @override
   void initState() {
     widget.controller.addListener(_initializeCamera);
@@ -60,8 +59,8 @@ class _PicturePickerState extends State<PicturePicker> {
                 width: width,
                 height: height,
                 child: snapshot.connectionState == ConnectionState.done &&
-                    widget.controller.cameraController != null &&
-                    widget.controller.cameraController!.value.isInitialized
+                        widget.controller.cameraController != null &&
+                        widget.controller.cameraController!.value.isInitialized
                     ? CameraPreview(widget.controller.cameraController!)
                     : Container(),
               ),
