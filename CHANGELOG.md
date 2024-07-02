@@ -1,3 +1,6 @@
+## 0.0.6
+- Fix behavior error in pictureCropperController.toggleCameraDirection
+
 ## 0.0.5
 -  dart format .
 

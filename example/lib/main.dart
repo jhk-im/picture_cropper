@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const MyHomePage(),
       initialRoute: '/',
       routes: {
         '/': (context) => const MyHomePage(),
@@ -144,10 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     InkWell(
-                      onTap: () async {
-                        await pictureCropperController.toggleCameraDirection();
-                        setState(() {}); // Update state after toggling camera
-                      },
+                      onTap: pictureCropperController.toggleCameraDirection,
                       child: const Icon(
                         Icons.cameraswitch,
                         color: Colors.white,

@@ -117,10 +117,7 @@ InkWell(
 
 // Method - toggleCameraDirection
 InkWell(
-  onTap: () async {
-    await pictureEditorController.toggleCameraDirection();
-    setState(() {}); // Update state after toggling camera
-  },
+  onTap: pictureCropperController.toggleCameraDirection,
   child: const Icon(
     Icons.photo,
     color: Colors.white,
