@@ -60,11 +60,11 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method toggles the camera direction in [PicturePicker].
-  void toggleCameraDirection() {
+  Future<void> toggleCameraDirection() async {
     _direction = (_direction == CameraLensDirection.back)
         ? CameraLensDirection.front
         : CameraLensDirection.back;
-    _initializeCamera();
+    await _initializeCamera();
   }
 
   /// This method is used for taking pictures in [PicturePicker].

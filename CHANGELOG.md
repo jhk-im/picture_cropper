@@ -1,3 +1,6 @@
+## 0.0.7
+- Changed pictureCropperController.toggleCameraDirection to async
+
 ## 0.0.6
 - Fix behavior error in pictureCropperController.toggleCameraDirection
 
