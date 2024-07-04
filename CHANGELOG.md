@@ -1,3 +1,6 @@
+## 0.1.0
+- fix front camera horizontal flip initialize issue
+
 ## 0.0.9
 - fix front camera horizontal flip
 

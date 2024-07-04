@@ -17,6 +17,8 @@ class PictureCropperController extends ChangeNotifier {
     if (onSelectedImage != null) {
       initializeControllerFuture = _initializeCamera();
     }
+    _isTakePicture = false;
+    _isFrontCamera = false;
     _isToggled = false;
   }
 
