@@ -55,7 +55,7 @@ class _CropImagePageState extends State<CropImagePage> {
           children: [
             PictureCrop(
               controller: pictureCropperController,
-              onCropped: (uiImage) {
+              onCropped: (uiImage) async {
                 /// If you need uiImage ...
                 _image = uiImage;
               },

@@ -1,3 +1,8 @@
+## 0.0.11
+- Refactor PictureCrop widget
+- Change the onCropped callback to a future.
+- Add a boolean value to the PictureCrop widget to handle cases where it's not necessary to display the image.
+
 ## 0.0.10
 - fix front camera horizontal flip initialize issue
 

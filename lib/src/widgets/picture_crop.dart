@@ -8,14 +8,20 @@ import '../../picture_cropper.dart';
 
 /// [PictureCrop] is a widget that displays the edited image as a [ui.Image] from [PictureEditor].
 /// The [controller] is used to access the original image bytes and crop path information.
+/// [isShowImage] is boolean value where it's not necessary to display the image.
+/// The [progressColor] adds a color for the progress indicator when it's necessary during image loading. (default is transparent)
 /// [onCropped] is used when the final [ui.Image] is needed.
 class PictureCrop extends StatefulWidget {
   final PictureCropperController controller;
-  final void Function(ui.Image) onCropped;
+  final Future<void> Function(ui.Image) onCropped;
+  final bool isShowImage;
+  final Color? progressColor;
 
   PictureCrop({
     super.key,
     required this.controller,
+    this.isShowImage = true,
+    this.progressColor,
     required this.onCropped,
   });
 
@@ -27,6 +33,7 @@ class _PictureCropState extends State<PictureCrop> {
   final GlobalKey _renderBoxKey = GlobalKey();
   Path _cropPath = Path();
   Size _renderBoxSize = ui.Size(0, 0);
+  Color progressColor = Colors.transparent;
 
   void _getStackSize(_) {
     final RenderBox renderBox =
@@ -48,6 +55,10 @@ class _PictureCropState extends State<PictureCrop> {
       ..lineTo(item.leftBottomX, item.leftBottomY)
       ..lineTo(item.leftTopX, item.leftTopY)
       ..close();
+
+    if (widget.progressColor != null) {
+      progressColor = widget.progressColor!;
+    }
   }
 
   @override
@@ -61,14 +72,22 @@ class _PictureCropState extends State<PictureCrop> {
             snapshot.hasData) {
           ui.Image image = snapshot.data!;
           widget.onCropped(image);
-          return Center(
-            child: RawImage(
-              image: image,
-              fit: BoxFit.contain,
-            ),
-          );
+          return widget.isShowImage
+              ? Center(
+                  child: RawImage(
+                    image: image,
+                    fit: BoxFit.contain,
+                  ),
+                )
+              : Center(
+                  child: CircularProgressIndicator(
+                  color: progressColor,
+                ));
         } else {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+              child: CircularProgressIndicator(
+            color: progressColor,
+          ));
         }
       },
     );
