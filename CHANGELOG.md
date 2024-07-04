@@ -1,3 +1,8 @@
+## 0.0.8
+- Add _isTakePicture in PictureCropperController
+- _isTakePicture = true: Represents an image taken by the camera.
+- _isTakePicture = false: Represents an image selected from gallery.
+
 ## 0.0.7
 - Changed pictureCropperController.toggleCameraDirection to async
 

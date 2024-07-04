@@ -70,7 +70,9 @@ class _PictureEditorState extends State<PictureEditor> {
               widget.controller.imageBytes,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              fit: BoxFit.contain,
+              fit: widget.controller.isTakePicture
+                  ? BoxFit.fill
+                  : BoxFit.contain,
             ),
           ),
           if (_size != null) ...{

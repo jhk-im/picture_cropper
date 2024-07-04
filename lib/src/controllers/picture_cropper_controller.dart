@@ -35,6 +35,10 @@ class PictureCropperController extends ChangeNotifier {
   static Uint8List _imageBytes = Uint8List(0);
   Uint8List get imageBytes => _imageBytes;
 
+  /// [_isTakePicture] check take picture or pick from gallery,
+  static bool _isTakePicture = false;
+  bool get isTakePicture => _isTakePicture;
+
   /// Used in [PicturePicker] for camera shooting.
   CameraController? _cameraController;
   CameraController? get cameraController => _cameraController;
@@ -77,6 +81,7 @@ class PictureCropperController extends ChangeNotifier {
       final image = await _cameraController!.takePicture();
       final bytes = await File(image.path).readAsBytes();
       _imageBytes = bytes;
+      _isTakePicture = true;
       onSelectedImage?.call(bytes);
     } catch (e) {
       print(e);
@@ -90,6 +95,7 @@ class PictureCropperController extends ChangeNotifier {
     if (pickedFile != null) {
       final bytes = await File(pickedFile.path).readAsBytes();
       _imageBytes = bytes;
+      _isTakePicture = false;
       onSelectedImage?.call(bytes);
     }
   }

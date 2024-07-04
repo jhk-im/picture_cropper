@@ -47,17 +47,14 @@ class _PicturePickerState extends State<PicturePicker> {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-
     return FutureBuilder<void>(
         future: widget.controller.initializeControllerFuture,
         builder: (context, snapshot) {
           return Stack(
             children: [
               SizedBox(
-                width: width,
-                height: height,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
                 child: snapshot.connectionState == ConnectionState.done &&
                         widget.controller.cameraController != null &&
                         widget.controller.cameraController!.value.isInitialized
