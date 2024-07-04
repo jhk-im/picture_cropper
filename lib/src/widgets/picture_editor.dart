@@ -43,6 +43,14 @@ class _PictureEditorState extends State<PictureEditor> {
 
   @override
   Widget build(BuildContext context) {
+    // Front Camera Horizontal Flip
+    double x = 1.0;
+    double y = 1.0;
+    if (widget.controller.isFrontCamera && widget.controller.isTakePicture) {
+      x = -1.0;
+      y = 1.0;
+    }
+
     return GestureDetector(
       onScaleStart: (ScaleStartDetails details) {
         // _baseRotation = _rotation;
@@ -62,7 +70,7 @@ class _PictureEditorState extends State<PictureEditor> {
         key: _stackKey,
         children: [
           Transform(
-            transform: Matrix4.identity(),
+            transform: Matrix4.identity()..scale(x, y),
             //..rotateZ(_rotation)
             //..scale(_scale),
             alignment: Alignment.center,

@@ -39,6 +39,10 @@ class PictureCropperController extends ChangeNotifier {
   static bool _isTakePicture = false;
   bool get isTakePicture => _isTakePicture;
 
+  /// [_isTakePicture] check camera direction
+  static bool _isFrontCamera = false;
+  bool get isFrontCamera => _isFrontCamera;
+
   /// Used in [PicturePicker] for camera shooting.
   CameraController? _cameraController;
   CameraController? get cameraController => _cameraController;
@@ -65,9 +69,13 @@ class PictureCropperController extends ChangeNotifier {
 
   /// This method toggles the camera direction in [PicturePicker].
   Future<void> toggleCameraDirection() async {
-    _direction = (_direction == CameraLensDirection.back)
-        ? CameraLensDirection.front
-        : CameraLensDirection.back;
+    if (_direction == CameraLensDirection.back) {
+      _isFrontCamera = true;
+      _direction = CameraLensDirection.front;
+    } else {
+      _isFrontCamera = false;
+      _direction = CameraLensDirection.back;
+    }
     await _initializeCamera();
   }
 
