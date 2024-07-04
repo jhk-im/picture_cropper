@@ -17,8 +17,6 @@ class PictureCropperController extends ChangeNotifier {
     if (onSelectedImage != null) {
       initializeControllerFuture = _initializeCamera();
     }
-    _isTakePicture = false;
-    _isFrontCamera = false;
     _isToggled = false;
   }
 
@@ -61,6 +59,7 @@ class PictureCropperController extends ChangeNotifier {
     final cameraDescription = cameras.firstWhere(
       (description) => description.lensDirection == _direction,
     );
+    _isFrontCamera = _direction == CameraLensDirection.front;
     _cameraController = CameraController(
       cameraDescription,
       ResolutionPreset.high,
@@ -71,13 +70,9 @@ class PictureCropperController extends ChangeNotifier {
 
   /// This method toggles the camera direction in [PicturePicker].
   Future<void> toggleCameraDirection() async {
-    if (_direction == CameraLensDirection.back) {
-      _isFrontCamera = true;
-      _direction = CameraLensDirection.front;
-    } else {
-      _isFrontCamera = false;
-      _direction = CameraLensDirection.back;
-    }
+    _direction = (_direction == CameraLensDirection.back)
+        ? CameraLensDirection.front
+        : CameraLensDirection.back;
     await _initializeCamera();
   }
 
