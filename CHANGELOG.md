@@ -1,3 +1,6 @@
+## 0.0.9
+- fix front camera horizontal flip
+
 ## 0.0.8
 - Add _isTakePicture in PictureCropperController
 - _isTakePicture = true: Represents an image taken by the camera.
