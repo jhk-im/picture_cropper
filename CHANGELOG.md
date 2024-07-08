@@ -1,13 +1,16 @@
+## 0.0.12
+- Fix shoot, edit, crop screens width and height sync
+
 ## 0.0.11
 - Refactor PictureCrop widget
 - Change the onCropped callback to a future.
 - Add a boolean value to the PictureCrop widget to handle cases where it's not necessary to display the image.
 
 ## 0.0.10
-- fix front camera horizontal flip initialize issue
+- Fix front camera horizontal flip initialize issue
 
 ## 0.0.9
-- fix front camera horizontal flip
+- Fix front camera horizontal flip
 
 ## 0.0.8
 - Add _isTakePicture in PictureCropperController

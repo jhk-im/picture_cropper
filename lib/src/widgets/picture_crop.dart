@@ -30,23 +30,12 @@ class PictureCrop extends StatefulWidget {
 }
 
 class _PictureCropState extends State<PictureCrop> {
-  final GlobalKey _renderBoxKey = GlobalKey();
   Path _cropPath = Path();
-  Size _renderBoxSize = ui.Size(0, 0);
   Color progressColor = Colors.transparent;
-
-  void _getStackSize(_) {
-    final RenderBox renderBox =
-        _renderBoxKey.currentContext?.findRenderObject() as RenderBox;
-    setState(() {
-      _renderBoxSize = renderBox.size;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_getStackSize);
     final item = widget.controller.picturePathItem;
     _cropPath = Path()
       ..moveTo(item.leftTopX, item.leftTopY)
@@ -64,7 +53,6 @@ class _PictureCropState extends State<PictureCrop> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ui.Image>(
-      key: _renderBoxKey,
       future: _loadImage(widget.controller.imageBytes,
           widget.controller.picturePathItem.scale),
       builder: (context, snapshot) {
@@ -76,7 +64,9 @@ class _PictureCropState extends State<PictureCrop> {
               ? Center(
                   child: RawImage(
                     image: image,
-                    fit: BoxFit.contain,
+                    fit: widget.controller.isTakePicture
+                        ? BoxFit.fill
+                        : BoxFit.contain,
                   ),
                 )
               : Center(
@@ -100,8 +90,16 @@ class _PictureCropState extends State<PictureCrop> {
       final recorder = ui.PictureRecorder();
       final Canvas canvas = Canvas(recorder);
 
-      final double scaledWidth = image.width * scale;
-      final double scaledHeight = image.height * scale;
+      double scaledWidth = 0;
+      double scaledHeight = 0;
+
+      if (widget.controller.isTakePicture) {
+        scaledWidth = widget.controller.renderBoxSize.width * scale * 1.035;
+        scaledHeight = widget.controller.renderBoxSize.height * scale;
+      } else {
+        scaledWidth = image.width * scale;
+        scaledHeight = image.height * scale;
+      }
 
       final Rect srcRect =
           Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
@@ -123,18 +121,24 @@ class _PictureCropState extends State<PictureCrop> {
     ui.Image image,
   ) async {
     final ui.PictureRecorder recorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(recorder,
-        Rect.fromLTWH(0, 0, _renderBoxSize.width, _renderBoxSize.height));
+    final Canvas canvas = Canvas(
+        recorder,
+        Rect.fromLTWH(0, 0, widget.controller.renderBoxSize.width,
+            widget.controller.renderBoxSize.height));
 
-    final _CropPainter painter = _CropPainter(image,
-        widget.controller.picturePathItem.scale, _cropPath, _renderBoxSize);
-    painter.paint(canvas, _renderBoxSize);
+    final _CropPainter painter = _CropPainter(
+        image,
+        widget.controller.picturePathItem.scale,
+        _cropPath,
+        widget.controller.renderBoxSize);
+    painter.paint(canvas, widget.controller.renderBoxSize);
 
     final ui.Picture picture = recorder.endRecording();
 
     final ui.Rect bounds = _cropPath.getBounds();
     final ui.Image fullImage = await picture.toImage(
-        _renderBoxSize.width.toInt(), _renderBoxSize.height.toInt());
+        widget.controller.renderBoxSize.width.toInt(),
+        widget.controller.renderBoxSize.height.toInt());
 
     final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
     final Canvas croppedCanvas = Canvas(

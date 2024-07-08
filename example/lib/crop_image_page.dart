@@ -68,13 +68,22 @@ class _CropImagePageState extends State<CropImagePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 32, height: 32),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                        size: 32,
+                      ),
+                    ),
                     InkWell(
                       onTap: () {
                         Navigator.pushReplacementNamed(context, '/');
                       },
                       child: const Icon(
-                        Icons.refresh,
+                        Icons.camera_alt,
                         size: 82,
                       ),
                     ),

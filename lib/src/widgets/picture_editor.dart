@@ -22,24 +22,8 @@ class PictureEditor extends StatefulWidget {
 }
 
 class _PictureEditorState extends State<PictureEditor> {
-  final GlobalKey _stackKey = GlobalKey();
-  Size? _size;
   double _scale = 1.0;
   double _baseScale = 1.0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_getStackSize);
-  }
-
-  void _getStackSize(_) {
-    final RenderBox renderBox =
-        _stackKey.currentContext?.findRenderObject() as RenderBox;
-    setState(() {
-      _size = renderBox.size;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +51,7 @@ class _PictureEditorState extends State<PictureEditor> {
         });
       },
       child: Stack(
-        key: _stackKey,
+        // key: _stackKey,
         children: [
           Transform(
             transform: Matrix4.identity()..scale(x, y),
@@ -76,40 +60,38 @@ class _PictureEditorState extends State<PictureEditor> {
             alignment: Alignment.center,
             child: Image.memory(
               widget.controller.imageBytes,
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              width: widget.controller.renderBoxSize.width,
+              height: widget.controller.renderBoxSize.height,
               fit: widget.controller.isTakePicture
                   ? BoxFit.fill
                   : BoxFit.contain,
             ),
           ),
-          if (_size != null) ...{
-            widget.controller.isIrregularCrop
-                ? IrregularCrop(
-                    width: _size?.width ?? 0,
-                    height: _size?.height ?? 0,
-                    picturePathItem: widget.controller.picturePathItem,
-                    backgroundColor: widget.cropBackgroundColor ??
-                        Colors.black.withAlpha(180),
-                    isToggled: widget.controller.isToggled,
-                    onUpdatePicturePathItem: (cropAreaClipItem) {
-                      cropAreaClipItem.scale = _scale;
-                      widget.controller.updatePicturePathItem(cropAreaClipItem);
-                    },
-                  )
-                : RectangleCrop(
-                    width: _size?.width ?? 0,
-                    height: _size?.height ?? 0,
-                    picturePathItem: widget.controller.picturePathItem,
-                    backgroundColor: widget.cropBackgroundColor ??
-                        Colors.black.withAlpha(180),
-                    isToggled: widget.controller.isToggled,
-                    onUpdatePicturePathItem: (cropAreaClipItem) {
-                      cropAreaClipItem.scale = _scale;
-                      widget.controller.updatePicturePathItem(cropAreaClipItem);
-                    },
-                  ),
-          }
+          widget.controller.isIrregularCrop
+              ? IrregularCrop(
+                  width: widget.controller.renderBoxSize.width,
+                  height: widget.controller.renderBoxSize.height,
+                  picturePathItem: widget.controller.picturePathItem,
+                  backgroundColor:
+                      widget.cropBackgroundColor ?? Colors.black.withAlpha(180),
+                  isToggled: widget.controller.isToggled,
+                  onUpdatePicturePathItem: (cropAreaClipItem) {
+                    cropAreaClipItem.scale = _scale;
+                    widget.controller.updatePicturePathItem(cropAreaClipItem);
+                  },
+                )
+              : RectangleCrop(
+                  width: widget.controller.renderBoxSize.width,
+                  height: widget.controller.renderBoxSize.height,
+                  picturePathItem: widget.controller.picturePathItem,
+                  backgroundColor:
+                      widget.cropBackgroundColor ?? Colors.black.withAlpha(180),
+                  isToggled: widget.controller.isToggled,
+                  onUpdatePicturePathItem: (cropAreaClipItem) {
+                    cropAreaClipItem.scale = _scale;
+                    widget.controller.updatePicturePathItem(cropAreaClipItem);
+                  },
+                ),
         ],
       ),
     );

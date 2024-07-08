@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +43,14 @@ class PictureCropperController extends ChangeNotifier {
   /// [_isTakePicture] check camera direction
   static bool _isFrontCamera = false;
   bool get isFrontCamera => _isFrontCamera;
+
+  /// [_renderBoxSize] include width and height of shoot, edit, crop screens
+  static ui.Size _renderBoxSize = ui.Size(0, 0);
+  ui.Size get renderBoxSize => _renderBoxSize;
+
+  void setRenderBoxSize(ui.Size size) {
+    _renderBoxSize = size;
+  }
 
   /// Used in [PicturePicker] for camera shooting.
   CameraController? _cameraController;
