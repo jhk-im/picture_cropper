@@ -125,13 +125,15 @@ class PictureCropperController extends ChangeNotifier {
 
   bool _isIrregularCrop = false;
   bool get isIrregularCrop => _isIrregularCrop;
+
+  /// Whether the [toggleIrregularCrop] method was called in the [PictureEditor].
   bool _isToggled = false;
   bool get isToggled => _isToggled;
 
   /// This method changes the type of crop in [PictureEditor].
-  void toggleIrregularCrop(bool isOn) {
+  void toggleIrregularCrop(bool isOn, {bool isToggled = true}) {
     _isIrregularCrop = isOn;
-    _isToggled = true;
+    _isToggled = isToggled;
   }
 
   /// This method disposes of the [_cameraController] used in [PicturePicker].
