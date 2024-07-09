@@ -55,7 +55,8 @@ class _PicturePickerState extends State<PicturePicker> {
     final RenderBox renderBox =
         _renderBoxKey.currentContext?.findRenderObject() as RenderBox;
     _renderBoxSize = renderBox.size;
-    widget.controller.setRenderBoxSize(_renderBoxSize);
+    widget.controller.setRenderBoxSizeAndGuidelineMargin(
+        _renderBoxSize, widget.guideLineMargin);
     setState(() {});
   }
 
@@ -78,6 +79,7 @@ class _PicturePickerState extends State<PicturePicker> {
               ),
               CameraCropGuideline(
                 cropGuideLineType: widget.controller.cropGuideType,
+                renderBoxSize: _renderBoxSize,
                 radius: widget.guideLineRadius,
                 margin: widget.guideLineMargin,
                 backgroundColor: widget.guideLineBackgroundColor ??

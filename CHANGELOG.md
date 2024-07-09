@@ -1,3 +1,6 @@
+## 0.0.14
+- Add resetController method in picture_cropper_controller
+
 ## 0.0.13
 - Add an argument to the controller crop type change method
 - [isToggled: false] Initialized crop path

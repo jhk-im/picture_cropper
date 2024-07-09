@@ -10,11 +10,13 @@ class CameraCropGuideline extends StatefulWidget {
   final PictureCropGuideLineType cropGuideLineType;
   final double radius;
   final double margin;
+  final Size renderBoxSize;
   final Color backgroundColor;
   final UpdatePicturePathItem onUpdatePicturePathItem;
 
   const CameraCropGuideline({
     required this.cropGuideLineType,
+    required this.renderBoxSize,
     required this.radius,
     required this.margin,
     required this.backgroundColor,
@@ -27,29 +29,10 @@ class CameraCropGuideline extends StatefulWidget {
 
 class CameraCropGuidelineState extends State<CameraCropGuideline> {
   PicturePathItem _picturePathItem = PicturePathItem();
-  final GlobalKey _stackKey = GlobalKey();
-  Size? _size;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(_getStackSize);
-  }
-
-  void _getStackSize(_) {
-    final RenderBox renderBox =
-        _stackKey.currentContext?.findRenderObject() as RenderBox;
-    setState(() {
-      _size = renderBox.size;
-      _setScannerCropGuideline();
-    });
-  }
 
   void _setScannerCropGuideline() {
-    if (_size == null) return;
-
-    final width = _size!.width;
-    final height = _size!.height;
+    final width = widget.renderBoxSize.width;
+    final height = widget.renderBoxSize.height;
     double left = 0;
     double top = 0;
     double right = 0;
@@ -95,8 +78,8 @@ class CameraCropGuidelineState extends State<CameraCropGuideline> {
 
   @override
   Widget build(BuildContext context) {
+    _setScannerCropGuideline();
     return Stack(
-      key: _stackKey,
       children: [
         Visibility(
           visible: widget.cropGuideLineType != PictureCropGuideLineType.clear,

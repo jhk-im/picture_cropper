@@ -48,8 +48,13 @@ class PictureCropperController extends ChangeNotifier {
   static ui.Size _renderBoxSize = ui.Size(0, 0);
   ui.Size get renderBoxSize => _renderBoxSize;
 
-  void setRenderBoxSize(ui.Size size) {
+  /// [_guidelineMargin] Guideline margin in [PicturePicker]
+  static double _guidelineMargin = 0;
+  double get guidelineMargin => _guidelineMargin;
+
+  void setRenderBoxSizeAndGuidelineMargin(ui.Size size, double margin) {
     _renderBoxSize = size;
+    _guidelineMargin = margin;
   }
 
   /// Used in [PicturePicker] for camera shooting.
@@ -139,6 +144,30 @@ class PictureCropperController extends ChangeNotifier {
   /// This method disposes of the [_cameraController] used in [PicturePicker].
   void pictureEditorControllerDispose() {
     _cameraController?.dispose();
+  }
+
+  /// This method initialize of the [PictureCropperController].
+  void resetController() {
+    _isToggled = false;
+    _isIrregularCrop = false;
+    _cropGuideType = PictureCropGuideLineType.qr;
+
+    double qrWidth = renderBoxSize.width - (guidelineMargin * 2);
+    double left = guidelineMargin;
+    double right = renderBoxSize.width - guidelineMargin;
+    double top = (renderBoxSize.height / 2) - (qrWidth / 2);
+    double bottom = top + qrWidth;
+
+    _picturePathItem = PicturePathItem(
+      leftTopX: left,
+      leftTopY: top,
+      rightTopX: right,
+      rightTopY: top,
+      rightBottomX: right,
+      rightBottomY: bottom,
+      leftBottomX: left,
+      leftBottomY: bottom,
+    );
   }
 
   /// Takes a Uint8List and returns the image extension type.
