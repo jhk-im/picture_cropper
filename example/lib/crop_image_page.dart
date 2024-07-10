@@ -53,12 +53,14 @@ class _CropImagePageState extends State<CropImagePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            PictureCrop(
-              controller: pictureCropperController,
-              onCropped: (uiImage) async {
-                /// If you need uiImage ...
-                _image = uiImage;
-              },
+            Center(
+              child: PictureCrop(
+                controller: pictureCropperController,
+                onCropped: (uiImage) async {
+                  /// If you need uiImage ...
+                  _image = uiImage;
+                },
+              ),
             ),
             Align(
               alignment: Alignment.bottomCenter,

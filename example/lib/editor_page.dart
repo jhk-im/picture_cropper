@@ -18,7 +18,7 @@ class _EditorPageState extends State<EditorPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            PictureEditor(controller: pictureCropperController),
+            Center(child: PictureEditor(controller: pictureCropperController)),
             Container(
               alignment: Alignment.topCenter,
               padding: const EdgeInsets.all(24),
@@ -32,7 +32,7 @@ class _EditorPageState extends State<EditorPage> {
                     },
                     child: const Icon(
                       Icons.arrow_back,
-                      color: Colors.white,
+                      color: Colors.black,
                       size: 32,
                     ),
                   ),
@@ -45,7 +45,7 @@ class _EditorPageState extends State<EditorPage> {
                     },
                     child: Icon(
                       Icons.crop_free,
-                      color: !_isIrregularCrop ? Colors.blue : Colors.white,
+                      color: !_isIrregularCrop ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),
@@ -58,7 +58,7 @@ class _EditorPageState extends State<EditorPage> {
                     },
                     child: Icon(
                       Icons.zoom_out_map,
-                      color: _isIrregularCrop ? Colors.blue : Colors.white,
+                      color: _isIrregularCrop ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),
@@ -79,7 +79,7 @@ class _EditorPageState extends State<EditorPage> {
                         },
                         child: const Icon(
                           Icons.radio_button_checked,
-                          color: Colors.white,
+                          color: Colors.black,
                           size: 82,
                         ),
                       ),

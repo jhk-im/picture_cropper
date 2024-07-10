@@ -65,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            PicturePicker(controller: pictureCropperController),
+            Center(child: PicturePicker(controller: pictureCropperController)),
             Container(
               alignment: Alignment.topCenter,
               height: 80,
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     child: Icon(
                       Icons.crop_din,
-                      color: _cropStatus == 0 ? Colors.blue : Colors.white,
+                      color: _cropStatus == 0 ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),
@@ -97,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     child: Icon(
                       Icons.crop_3_2,
-                      color: _cropStatus == 1 ? Colors.blue : Colors.white,
+                      color: _cropStatus == 1 ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),
@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     child: Icon(
                       Icons.not_interested,
-                      color: _cropStatus == 2 ? Colors.blue : Colors.white,
+                      color: _cropStatus == 2 ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),
@@ -130,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: pictureCropperController.pickImageFromGallery,
                       child: const Icon(
                         Icons.photo,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 32,
                       ),
                     ),
@@ -138,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: pictureCropperController.takePicture,
                       child: const Icon(
                         Icons.camera,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 82,
                       ),
                     ),
@@ -146,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: pictureCropperController.toggleCameraDirection,
                       child: const Icon(
                         Icons.cameraswitch,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 32,
                       ),
                     ),
