@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
@@ -31,12 +29,8 @@ class PicturePicker extends StatefulWidget {
 }
 
 class _PicturePickerState extends State<PicturePicker> {
-  final GlobalKey _renderBoxKey = GlobalKey();
-  Size _renderBoxSize = ui.Size(0, 0);
-
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_getStackSize);
     widget.controller.addListener(_initializeCamera);
     super.initState();
   }
@@ -51,45 +45,53 @@ class _PicturePickerState extends State<PicturePicker> {
     setState(() {});
   }
 
-  void _getStackSize(_) {
-    final RenderBox renderBox =
-        _renderBoxKey.currentContext?.findRenderObject() as RenderBox;
-    _renderBoxSize = renderBox.size;
-    widget.controller.setRenderBoxSizeAndGuidelineMargin(
-        _renderBoxSize, widget.guideLineMargin);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
-        key: _renderBoxKey,
         future: widget.controller.initializeControllerFuture,
         builder: (context, snapshot) {
-          return Stack(
-            children: [
-              SizedBox(
-                width: _renderBoxSize.width,
-                height: _renderBoxSize.height,
-                child: snapshot.connectionState == ConnectionState.done &&
-                        widget.controller.cameraController != null &&
-                        widget.controller.cameraController!.value.isInitialized
-                    ? CameraPreview(widget.controller.cameraController!)
-                    : Container(),
-              ),
-              CameraCropGuideline(
-                cropGuideLineType: widget.controller.cropGuideType,
-                renderBoxSize: _renderBoxSize,
-                radius: widget.guideLineRadius,
-                margin: widget.guideLineMargin,
-                backgroundColor: widget.guideLineBackgroundColor ??
-                    Colors.black.withAlpha(180),
-                onUpdatePicturePathItem: (picturePathItem) {
-                  widget.controller.updatePicturePathItem(picturePathItem);
-                },
-              ),
-            ],
-          );
+          if (snapshot.connectionState == ConnectionState.done &&
+              widget.controller.cameraController != null &&
+              widget.controller.cameraController!.value.isInitialized) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final renderBoxSize = constraints.biggest;
+                final previewSize =
+                    widget.controller.cameraController!.value.previewSize!;
+                final double aspectRatio =
+                    previewSize.width / previewSize.height;
+                final double width = renderBoxSize.width;
+                final double height = width * aspectRatio;
+                widget.controller.setRenderBoxSizeAndGuidelineMargin(
+                    width, height, widget.guideLineMargin);
+
+                return Stack(
+                  children: [
+                    CameraPreview(widget.controller.cameraController!),
+                    SizedBox(
+                      width: width,
+                      height: height,
+                      child: CameraCropGuideline(
+                        cropGuideLineType: widget.controller.cropGuideType,
+                        backgroundWidth: width,
+                        backgroundHeight: height,
+                        radius: widget.guideLineRadius,
+                        margin: widget.guideLineMargin,
+                        backgroundColor: widget.guideLineBackgroundColor ??
+                            Colors.black.withAlpha(180),
+                        onUpdatePicturePathItem: (picturePathItem) {
+                          widget.controller
+                              .updatePicturePathItem(picturePathItem);
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            return Container();
+          }
         });
   }
 }

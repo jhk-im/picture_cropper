@@ -8,15 +8,17 @@ typedef UpdatePicturePathItem = Function(PicturePathItem);
 
 class CameraCropGuideline extends StatefulWidget {
   final PictureCropGuideLineType cropGuideLineType;
+  final double backgroundWidth;
+  final double backgroundHeight;
   final double radius;
   final double margin;
-  final Size renderBoxSize;
   final Color backgroundColor;
   final UpdatePicturePathItem onUpdatePicturePathItem;
 
   const CameraCropGuideline({
     required this.cropGuideLineType,
-    required this.renderBoxSize,
+    required this.backgroundWidth,
+    required this.backgroundHeight,
     required this.radius,
     required this.margin,
     required this.backgroundColor,
@@ -31,8 +33,8 @@ class CameraCropGuidelineState extends State<CameraCropGuideline> {
   PicturePathItem _picturePathItem = PicturePathItem();
 
   void _setScannerCropGuideline() {
-    final width = widget.renderBoxSize.width;
-    final height = widget.renderBoxSize.height;
+    final width = widget.backgroundWidth;
+    final height = widget.backgroundHeight;
     double left = 0;
     double top = 0;
     double right = 0;

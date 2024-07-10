@@ -1,3 +1,6 @@
+## 0.0.15
+- Change the camera preview screen area
+
 ## 0.0.14
 - Add resetController method in picture_cropper_controller
 

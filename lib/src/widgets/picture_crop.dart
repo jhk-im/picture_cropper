@@ -53,8 +53,7 @@ class _PictureCropState extends State<PictureCrop> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ui.Image>(
-      future: _loadImage(widget.controller.imageBytes,
-          widget.controller.picturePathItem.scale),
+      future: _loadCropImage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
@@ -83,77 +82,43 @@ class _PictureCropState extends State<PictureCrop> {
     );
   }
 
-  /// This method converts [Uint8List] bytes to a [ui.Image].
-  Future<ui.Image> _loadImage(Uint8List img, double scale) async {
+  /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
+  Future<ui.Image> _loadCropImage() async {
     final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(img, (ui.Image image) async {
-      final recorder = ui.PictureRecorder();
-      final Canvas canvas = Canvas(recorder);
+    ui.decodeImageFromList(widget.controller.imageBytes,
+        (ui.Image image) async {
+      final width = widget.controller.renderBoxWidth;
+      final height = widget.controller.renderBoxHeight;
+      final size = ui.Size(width, height);
 
-      double scaledWidth = 0;
-      double scaledHeight = 0;
-
-      if (widget.controller.isTakePicture) {
-        scaledWidth = widget.controller.renderBoxSize.width * scale * 1.035;
-        scaledHeight = widget.controller.renderBoxSize.height * scale;
-      } else {
-        scaledWidth = image.width * scale;
-        scaledHeight = image.height * scale;
-      }
-
-      final Rect srcRect =
-          Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
-      final Rect dstRect = Rect.fromLTWH(0, 0, scaledWidth, scaledHeight);
-
-      canvas.drawImageRect(image, srcRect, dstRect, Paint());
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+      final Canvas canvas =
+          Canvas(recorder, Rect.fromLTWH(0, 0, width, height));
+      final _CropPainter painter = _CropPainter(image, _cropPath, size);
+      painter.paint(canvas, size);
 
       final ui.Picture picture = recorder.endRecording();
-      final ui.Image scaledImage =
-          await picture.toImage(scaledWidth.toInt(), scaledHeight.toInt());
-      final cropImage = await _getImageFromCustomPainter(scaledImage);
+      final ui.Rect bounds = _cropPath.getBounds();
+      final ui.Image fullImage =
+          await picture.toImage(width.toInt(), height.toInt());
+
+      final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
+      final Canvas croppedCanvas = Canvas(
+          croppedRecorder, Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+
+      final Rect srcRect =
+          Rect.fromLTWH(bounds.left, bounds.top, bounds.width, bounds.height);
+
+      final Rect dstRect = Rect.fromLTWH(0, 0, bounds.width, bounds.height);
+      croppedCanvas.drawImageRect(fullImage, srcRect, dstRect, Paint());
+
+      final ui.Picture croppedPicture = croppedRecorder.endRecording();
+      final cropImage = await croppedPicture.toImage(
+          bounds.width.toInt(), bounds.height.toInt());
+
       completer.complete(cropImage);
     });
     return completer.future;
-  }
-
-  /// It redraws the converted [ui.Image] to fit the crop coordinates size of [PicturePathItem].
-  Future<ui.Image> _getImageFromCustomPainter(
-    ui.Image image,
-  ) async {
-    final ui.PictureRecorder recorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(
-        recorder,
-        Rect.fromLTWH(0, 0, widget.controller.renderBoxSize.width,
-            widget.controller.renderBoxSize.height));
-
-    final _CropPainter painter = _CropPainter(
-        image,
-        widget.controller.picturePathItem.scale,
-        _cropPath,
-        widget.controller.renderBoxSize);
-    painter.paint(canvas, widget.controller.renderBoxSize);
-
-    final ui.Picture picture = recorder.endRecording();
-
-    final ui.Rect bounds = _cropPath.getBounds();
-    final ui.Image fullImage = await picture.toImage(
-        widget.controller.renderBoxSize.width.toInt(),
-        widget.controller.renderBoxSize.height.toInt());
-
-    final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
-    final Canvas croppedCanvas = Canvas(
-        croppedRecorder, Rect.fromLTWH(0, 0, bounds.width, bounds.height));
-    final Paint paint = Paint();
-    final Rect srcRect =
-        Rect.fromLTWH(bounds.left, bounds.top, bounds.width, bounds.height);
-    final Rect dstRect = Rect.fromLTWH(0, 0, bounds.width, bounds.height);
-    croppedCanvas.drawImageRect(fullImage, srcRect, dstRect, paint);
-
-    final ui.Picture croppedPicture = croppedRecorder.endRecording();
-    final ui.Image croppedImage = await croppedPicture.toImage(
-        bounds.width.toInt(), bounds.height.toInt());
-
-    return croppedImage;
   }
 }
 
@@ -164,11 +129,10 @@ class _PictureCropState extends State<PictureCrop> {
 /// [renderBoxSize] is the size of the drawn image.
 class _CropPainter extends CustomPainter {
   final ui.Image image;
-  final double scale;
   final Path cropPath;
   final Size renderBoxSize;
 
-  _CropPainter(this.image, this.scale, this.cropPath, this.renderBoxSize);
+  _CropPainter(this.image, this.cropPath, this.renderBoxSize);
 
   @override
   void paint(Canvas canvas, Size size) {

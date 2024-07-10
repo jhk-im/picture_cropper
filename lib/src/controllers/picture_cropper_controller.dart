@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -45,15 +44,23 @@ class PictureCropperController extends ChangeNotifier {
   bool get isFrontCamera => _isFrontCamera;
 
   /// [_renderBoxSize] include width and height of shoot, edit, crop screens
-  static ui.Size _renderBoxSize = ui.Size(0, 0);
-  ui.Size get renderBoxSize => _renderBoxSize;
+  // static ui.Size _renderBoxSize = ui.Size(0, 0);
+  // ui.Size get renderBoxSize => _renderBoxSize;
+
+  static double _renderBoxWidth = 0;
+  double get renderBoxWidth => _renderBoxWidth;
+
+  static double _renderBoxHeight = 0;
+  double get renderBoxHeight => _renderBoxHeight;
 
   /// [_guidelineMargin] Guideline margin in [PicturePicker]
   static double _guidelineMargin = 0;
   double get guidelineMargin => _guidelineMargin;
 
-  void setRenderBoxSizeAndGuidelineMargin(ui.Size size, double margin) {
-    _renderBoxSize = size;
+  void setRenderBoxSizeAndGuidelineMargin(
+      double width, double height, double margin) {
+    _renderBoxWidth = width;
+    _renderBoxHeight = height;
     _guidelineMargin = margin;
   }
 
@@ -76,10 +83,11 @@ class PictureCropperController extends ChangeNotifier {
     _isFrontCamera = _direction == CameraLensDirection.front;
     _cameraController = CameraController(
       cameraDescription,
-      ResolutionPreset.high,
+      ResolutionPreset.max,
     );
+
     await _cameraController!.initialize();
-    notifyListeners();
+    notifyListeners(); // camera toggle notification
   }
 
   /// This method toggles the camera direction in [PicturePicker].
@@ -152,10 +160,10 @@ class PictureCropperController extends ChangeNotifier {
     _isIrregularCrop = false;
     _cropGuideType = PictureCropGuideLineType.qr;
 
-    double qrWidth = renderBoxSize.width - (guidelineMargin * 2);
+    double qrWidth = renderBoxWidth - (guidelineMargin * 2);
     double left = guidelineMargin;
-    double right = renderBoxSize.width - guidelineMargin;
-    double top = (renderBoxSize.height / 2) - (qrWidth / 2);
+    double right = renderBoxWidth - guidelineMargin;
+    double top = (renderBoxHeight / 2) - (qrWidth / 2);
     double bottom = top + qrWidth;
 
     _picturePathItem = PicturePathItem(
