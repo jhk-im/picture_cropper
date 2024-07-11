@@ -45,10 +45,15 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     pictureCropperController = PictureCropperController(
-      onSelectedImage: (Uint8List image) {
-        setState(() {
-          Navigator.pushNamed(context, '/editor');
-        });
+      onSelectedImage: (Uint8List image) async {
+        final result = await Navigator.pushNamed(context, '/editor');
+        if (result == true) {
+          setState(() {
+            _cropStatus = 0;
+            pictureCropperController
+                .changeCropGuideLineType(PictureCropGuideLineType.qr);
+          });
+        }
       },
     );
   }
