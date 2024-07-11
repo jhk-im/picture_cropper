@@ -1,68 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:picture_cropper/picture_cropper.dart';
-
-import '../../common/constants.dart';
-import '../../common/picture_path_item.dart';
-import 'crop_area_clipper.dart';
-import 'crop_control_point.dart';
+import 'package:picture_cropper/src/common/constants.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_control_point.dart';
 
 class IrregularCrop extends StatelessWidget {
   final double width;
   final double height;
   final Color backgroundColor;
-  final bool isToggled;
-  final PicturePathItem? picturePathItem;
-  final ValueChanged<PicturePathItem> onUpdatePicturePathItem;
+  final CropAreaItem? picturePathItem;
+  final ValueChanged<CropAreaItem> onUpdatePicturePathItem;
 
   IrregularCrop({
     super.key,
     required this.width,
     required this.height,
     required this.backgroundColor,
-    required this.isToggled,
     this.picturePathItem,
     required this.onUpdatePicturePathItem,
   });
 
   @override
   Widget build(BuildContext context) {
-    double qrWidth = width - (16 * 2);
-    double left = 16;
-    double right = width - 16;
-    double top = (height / 2) - (qrWidth / 2);
-    double bottom = top + qrWidth;
-
-    final initCropItem = PicturePathItem(
-      leftTopX: left,
-      leftTopY: top,
-      rightTopX: right,
-      rightTopY: top,
-      rightBottomX: right,
-      rightBottomY: bottom,
-      leftBottomX: left,
-      leftBottomY: bottom,
-    );
-
-    if (isToggled) {
-      final controller = PictureCropperController();
-      controller.updatePicturePathItem(initCropItem);
-    }
-
     return _IrregularCorpEditor(
       onUpdateCrop: onUpdatePicturePathItem,
       clipBehavior: Clip.hardEdge,
-      initCropItem: picturePathItem == null || isToggled
-          ? initCropItem
-          : picturePathItem!,
+      initCropItem: picturePathItem,
       backgroundColor: backgroundColor,
     );
   }
 }
 
 class _IrregularCorpEditor extends StatefulWidget {
-  final ValueChanged<PicturePathItem> onUpdateCrop;
+  final ValueChanged<CropAreaItem> onUpdateCrop;
   final Clip clipBehavior;
-  final PicturePathItem initCropItem;
+  final CropAreaItem? initCropItem;
   final Color backgroundColor;
 
   const _IrregularCorpEditor({
@@ -77,13 +49,13 @@ class _IrregularCorpEditor extends StatefulWidget {
 }
 
 class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
-  PicturePathItem _cropItem = PicturePathItem();
+  CropAreaItem _cropItem = CropAreaItem();
 
   @override
   void initState() {
-    setState(() {
-      _cropItem = widget.initCropItem;
-    });
+    if (widget.initCropItem != null) {
+      _cropItem = widget.initCropItem!;
+    }
     super.initState();
   }
 
@@ -111,6 +83,8 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               RenderBox box = context.findRenderObject() as RenderBox;
               Offset localPosition = box.globalToLocal(details.globalPosition);
 
+              print(localPosition);
+
               final dx = localPosition.dx;
               final dy = localPosition.dy;
               final screenWidth = box.size.width - irregularCropItemLimit;
@@ -132,7 +106,7 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
                 return;
               }
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: dx,
                 leftTopY: dy,
                 rightTopX: _cropItem.rightTopX,
@@ -180,7 +154,7 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
                 return;
               }
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: _cropItem.leftTopX,
                 leftTopY: _cropItem.leftTopY,
                 rightTopX: dx,
@@ -227,7 +201,7 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
                 return;
               }
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: _cropItem.leftTopX,
                 leftTopY: _cropItem.leftTopY,
                 rightTopX: _cropItem.rightTopX,
@@ -274,7 +248,7 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
                 return;
               }
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: _cropItem.leftTopX,
                 leftTopY: _cropItem.leftTopY,
                 rightTopX: _cropItem.rightTopX,

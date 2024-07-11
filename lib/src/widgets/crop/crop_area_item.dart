@@ -1,7 +1,7 @@
-/// [PicturePathItem] includes the coordinate information, scale, and rotation data for cropping and guidelines.
+/// [CropAreaItem] includes the coordinate information, scale, and rotation data for cropping and guidelines.
 /// It is used only within the package.
-class PicturePathItem {
-  PicturePathItem({
+class CropAreaItem {
+  CropAreaItem({
     this.leftTopX = 0,
     this.leftTopY = 0,
     this.rightTopX = 0,
@@ -10,8 +10,8 @@ class PicturePathItem {
     this.rightBottomY = 0,
     this.leftBottomX = 0,
     this.leftBottomY = 0,
-    this.scale = 1.0,
-    this.rotate = 0,
+    //this.scale = 1.0,
+    //this.rotate = 0,
   });
   final double leftTopX;
   final double leftTopY;
@@ -22,12 +22,12 @@ class PicturePathItem {
   final double leftBottomX;
   final double leftBottomY;
 
-  double scale;
-  double rotate;
+  // double scale;
+  // double rotate;
 
   @override
   String toString() {
-    return 'PicturePathItem: '
+    return 'CropAreaItem: '
         'leftTopX: $leftTopX, '
         'leftTopY: $leftTopY, '
         'rightTopX: $rightTopX, '
@@ -35,8 +35,8 @@ class PicturePathItem {
         'rightBottomX: $rightBottomX, '
         'rightBottomY: $rightBottomY, '
         'leftBottomX: $leftBottomX, '
-        'leftBottomY: $leftBottomY, '
-        'scale: $scale, '
-        'rotate: $rotate';
+        'leftBottomY: $leftBottomY, ';
+    //'scale: $scale, '
+    //'rotate: $rotate';
   }
 }

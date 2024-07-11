@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:picture_cropper/src/common/enums.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
 
-import '../../common/picture_path_item.dart';
-import '../../common/enums.dart';
-import 'crop_area_clipper.dart';
-
-typedef UpdatePicturePathItem = Function(PicturePathItem);
+typedef UpdatePicturePathItem = Function(CropAreaItem);
 
 class CameraCropGuideline extends StatefulWidget {
   final PictureCropGuideLineType cropGuideLineType;
@@ -30,39 +29,35 @@ class CameraCropGuideline extends StatefulWidget {
 }
 
 class CameraCropGuidelineState extends State<CameraCropGuideline> {
-  PicturePathItem _picturePathItem = PicturePathItem();
+  CropAreaItem _picturePathItem = CropAreaItem();
 
   void _setScannerCropGuideline() {
     final width = widget.backgroundWidth;
     final height = widget.backgroundHeight;
-    double left = 0;
+    double qrWidth = width - (widget.margin * 2);
     double top = 0;
     double right = 0;
     double bottom = 0;
 
     if (widget.cropGuideLineType != PictureCropGuideLineType.card) {
-      double qrWidth = width - (widget.margin * 2);
-      left = widget.margin;
       right = width - widget.margin;
       top = (height / 2) - (qrWidth / 2);
       bottom = top + qrWidth;
     } else {
-      double qrWidth = width - (widget.margin * 2);
       double qrHeight = qrWidth * 0.62;
-      left = widget.margin;
       right = width - widget.margin;
       top = (height / 2) - (qrHeight / 2);
       bottom = top + qrHeight;
     }
 
-    _picturePathItem = PicturePathItem(
-      leftTopX: left,
+    _picturePathItem = CropAreaItem(
+      leftTopX: widget.margin,
       leftTopY: top,
       rightTopX: right,
       rightTopY: top,
       rightBottomX: right,
       rightBottomY: bottom,
-      leftBottomX: left,
+      leftBottomX: widget.margin,
       leftBottomY: bottom,
     );
 

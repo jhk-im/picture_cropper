@@ -4,9 +4,8 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:picture_cropper/picture_cropper.dart';
-
-import '../common/picture_path_item.dart';
+import 'package:picture_cropper/src/common/enums.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
 
 /// This class includes methods for camera shooting, gallery picking, and editing.
 /// It is mandatory to use it in [PicturePicker], [PictureEditor], and [PictureCrop] widgets.
@@ -17,18 +16,17 @@ class PictureCropperController extends ChangeNotifier {
     if (onSelectedImage != null) {
       initializeControllerFuture = _initializeCamera();
     }
-    _isToggled = false;
   }
 
-  /// [_picturePathItem] contains guide line and crop coordinate information and is used only within the package.
+  /// [_cropAreaItem] contains guide line and crop coordinate information and is used only within the package.
   /// It is used in [PicturePicker], [PictureEditor], and [PictureCrop] widgets.
-  static PicturePathItem _picturePathItem = PicturePathItem();
-  PicturePathItem get picturePathItem => _picturePathItem;
+  static CropAreaItem _cropAreaItem = CropAreaItem();
+  CropAreaItem get cropAreaItem => _cropAreaItem;
 
   /// Do not call this method from outside the package.
   /// Calling this method from outside the package may cause the package to not work properly.
-  updatePicturePathItem(PicturePathItem picturePathItem) {
-    _picturePathItem = picturePathItem;
+  updatePicturePathItem(CropAreaItem picturePathItem) {
+    _cropAreaItem = picturePathItem;
   }
 
   /// [_imageBytes] contains the original and edited pictures as Unit8List.
@@ -39,17 +37,13 @@ class PictureCropperController extends ChangeNotifier {
   static bool _isTakePicture = false;
   bool get isTakePicture => _isTakePicture;
 
-  /// [_isTakePicture] check camera direction
+  /// [isFrontCamera] check camera direction
   static bool _isFrontCamera = false;
   bool get isFrontCamera => _isFrontCamera;
 
-  /// [_renderBoxSize] include width and height of shoot, edit, crop screens
-  // static ui.Size _renderBoxSize = ui.Size(0, 0);
-  // ui.Size get renderBoxSize => _renderBoxSize;
-
+  /// [_renderBoxWidth], [_renderBoxHeight] is size of [PicturePicker], [PictureEditor], [PictureCrop] screens renderBox
   static double _renderBoxWidth = 0;
   double get renderBoxWidth => _renderBoxWidth;
-
   static double _renderBoxHeight = 0;
   double get renderBoxHeight => _renderBoxHeight;
 
@@ -134,48 +128,47 @@ class PictureCropperController extends ChangeNotifier {
   /// This method changes the type of camera guideline in [PicturePicker].
   void changeCropGuideLineType(PictureCropGuideLineType type) {
     _cropGuideType = type;
-  }
-
-  bool _isIrregularCrop = false;
-  bool get isIrregularCrop => _isIrregularCrop;
-
-  /// Whether the [toggleIrregularCrop] method was called in the [PictureEditor].
-  bool _isToggled = false;
-  bool get isToggled => _isToggled;
-
-  /// This method changes the type of crop in [PictureEditor].
-  void toggleIrregularCrop(bool isOn, {bool isToggled = true}) {
-    _isIrregularCrop = isOn;
-    _isToggled = isToggled;
-  }
-
-  /// This method disposes of the [_cameraController] used in [PicturePicker].
-  void pictureEditorControllerDispose() {
-    _cameraController?.dispose();
-  }
-
-  /// This method initialize of the [PictureCropperController].
-  void resetController() {
-    _isToggled = false;
-    _isIrregularCrop = false;
-    _cropGuideType = PictureCropGuideLineType.qr;
 
     double qrWidth = renderBoxWidth - (guidelineMargin * 2);
-    double left = guidelineMargin;
-    double right = renderBoxWidth - guidelineMargin;
-    double top = (renderBoxHeight / 2) - (qrWidth / 2);
-    double bottom = top + qrWidth;
+    double top = 0;
+    double right = 0;
+    double bottom = 0;
 
-    _picturePathItem = PicturePathItem(
-      leftTopX: left,
+    if (_cropGuideType != PictureCropGuideLineType.card) {
+      right = renderBoxWidth - guidelineMargin;
+      top = (renderBoxHeight / 2) - (qrWidth / 2);
+      bottom = top + qrWidth;
+    } else {
+      double qrHeight = qrWidth * 0.62;
+      right = renderBoxWidth - guidelineMargin;
+      top = (renderBoxHeight / 2) - (qrHeight / 2);
+      bottom = top + qrHeight;
+    }
+
+    _cropAreaItem = CropAreaItem(
+      leftTopX: guidelineMargin,
       leftTopY: top,
       rightTopX: right,
       rightTopY: top,
       rightBottomX: right,
       rightBottomY: bottom,
-      leftBottomX: left,
+      leftBottomX: guidelineMargin,
       leftBottomY: bottom,
     );
+  }
+
+  bool _isIrregularCrop = false;
+  bool get isIrregularCrop => _isIrregularCrop;
+
+  /// This method changes the type of crop in [PictureEditor].
+  void toggleIrregularCrop(bool isOn) {
+    _isIrregularCrop = isOn;
+    changeCropGuideLineType(PictureCropGuideLineType.qr);
+  }
+
+  /// This method disposes of the [_cameraController] used in [PicturePicker].
+  void pictureEditorControllerDispose() {
+    _cameraController?.dispose();
   }
 
   /// Takes a Uint8List and returns the image extension type.

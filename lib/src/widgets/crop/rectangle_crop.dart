@@ -1,68 +1,40 @@
 import 'package:flutter/material.dart';
-
-import '../../../picture_cropper.dart';
-import '../../common/constants.dart';
-import '../../common/picture_path_item.dart';
-import 'crop_area_clipper.dart';
-import 'crop_control_point.dart';
+import 'package:picture_cropper/src/common/constants.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
+import 'package:picture_cropper/src/widgets/crop/crop_control_point.dart';
 
 class RectangleCrop extends StatelessWidget {
   final double width;
   final double height;
   final Color backgroundColor;
-  final bool isToggled;
-  final PicturePathItem? picturePathItem;
-  final ValueChanged<PicturePathItem> onUpdatePicturePathItem;
+  final CropAreaItem? picturePathItem;
+  final ValueChanged<CropAreaItem> onUpdatePicturePathItem;
 
   RectangleCrop({
     super.key,
     required this.width,
     required this.height,
     required this.backgroundColor,
-    required this.isToggled,
     this.picturePathItem,
     required this.onUpdatePicturePathItem,
   });
 
   @override
   Widget build(BuildContext context) {
-    double qrWidth = width - (16 * 2);
-    double left = 16;
-    double right = width - 16;
-    double top = (height / 2) - (qrWidth / 2);
-    double bottom = top + qrWidth;
-
-    final initCropItem = PicturePathItem(
-      leftTopX: left,
-      leftTopY: top,
-      rightTopX: right,
-      rightTopY: top,
-      rightBottomX: right,
-      rightBottomY: bottom,
-      leftBottomX: left,
-      leftBottomY: bottom,
-    );
-
-    if (isToggled) {
-      final controller = PictureCropperController();
-      controller.updatePicturePathItem(initCropItem);
-    }
-
     return _RectangleCorpEditor(
       onUpdateCrop: onUpdatePicturePathItem,
       clipBehavior: Clip.hardEdge,
-      initCropItem: picturePathItem == null || isToggled
-          ? initCropItem
-          : picturePathItem!,
+      initCropItem: picturePathItem,
       backgroundColor: backgroundColor,
     );
   }
 }
 
 class _RectangleCorpEditor extends StatefulWidget {
-  final ValueChanged<PicturePathItem> onUpdateCrop;
+  final ValueChanged<CropAreaItem> onUpdateCrop;
   final Clip clipBehavior;
-  final PicturePathItem initCropItem;
+  final CropAreaItem? initCropItem;
   final Color backgroundColor;
 
   const _RectangleCorpEditor({
@@ -77,13 +49,13 @@ class _RectangleCorpEditor extends StatefulWidget {
 }
 
 class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
-  PicturePathItem _cropItem = PicturePathItem();
+  CropAreaItem _cropItem = CropAreaItem();
 
   @override
   void initState() {
-    setState(() {
-      _cropItem = widget.initCropItem;
-    });
+    if (widget.initCropItem != null) {
+      _cropItem = widget.initCropItem!;
+    }
     super.initState();
   }
 
@@ -115,11 +87,13 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
               final dy = localPosition.dy;
 
               final limitMinX =
-                  _cropItem.rightTopX - dx < rectangleCropItemLimit;
+                  _cropItem.rightTopX - dx < rectangleCropItemLimit ||
+                      dx < cropLimit;
               final limitMinY =
-                  _cropItem.leftBottomY - dy < rectangleCropItemLimit;
+                  _cropItem.leftBottomY - dy < rectangleCropItemLimit ||
+                      dy < cropLimit;
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: limitMinX ? _cropItem.leftTopX : dx,
                 leftTopY: limitMinY ? _cropItem.leftTopY : dy,
                 rightTopX: _cropItem.rightTopX,
@@ -151,11 +125,13 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
               final dy = localPosition.dy;
 
               final limitMinX =
-                  dx - _cropItem.leftTopX < rectangleCropItemLimit;
+                  dx - _cropItem.leftTopX < rectangleCropItemLimit ||
+                      dx > box.size.width - cropLimit;
               final limitMinY =
-                  _cropItem.rightBottomY - dy < rectangleCropItemLimit;
+                  _cropItem.rightBottomY - dy < rectangleCropItemLimit ||
+                      dy < cropLimit;
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: _cropItem.leftTopX,
                 leftTopY: limitMinY ? _cropItem.leftTopY : dy,
                 rightTopX: limitMinX ? _cropItem.rightTopX : dx,
@@ -187,11 +163,13 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
               final dy = localPosition.dy;
 
               final limitMinX =
-                  dx - _cropItem.leftBottomX < rectangleCropItemLimit;
+                  dx - _cropItem.leftBottomX < rectangleCropItemLimit ||
+                      dx > box.size.width - cropLimit;
               final limitMinY =
-                  dy - _cropItem.rightTopY < rectangleCropItemLimit;
+                  dy - _cropItem.rightTopY < rectangleCropItemLimit ||
+                      dy > box.size.height - cropLimit;
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: _cropItem.leftTopX,
                 leftTopY: _cropItem.leftTopY,
                 rightTopX: limitMinX ? _cropItem.rightTopX : dx,
@@ -223,11 +201,13 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
               final dy = localPosition.dy;
 
               final limitMinX =
-                  _cropItem.rightBottomX - dx < rectangleCropItemLimit;
+                  _cropItem.rightBottomX - dx < rectangleCropItemLimit ||
+                      dx < cropLimit;
               final limitMinY =
-                  dy - _cropItem.leftTopY < rectangleCropItemLimit;
+                  dy - _cropItem.leftTopY < rectangleCropItemLimit ||
+                      dy > box.size.height - cropLimit;
 
-              final update = PicturePathItem(
+              final update = CropAreaItem(
                 leftTopX: limitMinX ? _cropItem.leftTopX : dx,
                 leftTopY: _cropItem.leftTopY,
                 rightTopX: _cropItem.rightTopX,

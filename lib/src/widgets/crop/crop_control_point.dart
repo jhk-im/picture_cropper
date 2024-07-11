@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../common/constants.dart';
+import 'package:picture_cropper/src/common/constants.dart';
 
 /// [CropControlPoint] is used as a [GestureDetector] point when editing the crop area and to indicate the guideline area.
 /// [color] determines the color of the point.
@@ -43,16 +42,16 @@ class CropControlPoint extends StatelessWidget {
 
     return Transform.translate(
       offset: pointShape == 1
-          ? Offset(10, 10)
+          ? Offset(20, 20)
           : pointShape == 2
-              ? Offset(-10, 10)
+              ? Offset(-20, 20)
               : pointShape == 3
-                  ? Offset(-10, -10)
-                  : Offset(10, -10),
+                  ? Offset(-20, -20)
+                  : Offset(20, -20),
       child: Container(
         padding: pointShape == 2 || pointShape == 3
-            ? EdgeInsets.only(top: 4, right: 4, bottom: 4, left: 8)
-            : EdgeInsets.only(top: 4, right: 8, bottom: 4, left: 4),
+            ? EdgeInsets.only(top: 8, right: 8, bottom: 8, left: 32)
+            : EdgeInsets.only(top: 8, right: 32, bottom: 8, left: 8),
         child: Stack(
           children: [
             Align(

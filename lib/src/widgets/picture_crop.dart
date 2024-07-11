@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:picture_cropper/src/common/picture_path_item.dart';
-
-import '../../picture_cropper.dart';
+import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
 
 /// [PictureCrop] is a widget that displays the edited image as a [ui.Image] from [PictureEditor].
 /// The [controller] is used to access the original image bytes and crop path information.
@@ -30,14 +28,14 @@ class PictureCrop extends StatefulWidget {
 }
 
 class _PictureCropState extends State<PictureCrop> {
-  Path _cropPath = Path();
+  Path _cropAreaPath = Path();
   Color progressColor = Colors.transparent;
 
   @override
   void initState() {
     super.initState();
-    final item = widget.controller.picturePathItem;
-    _cropPath = Path()
+    final item = widget.controller.cropAreaItem;
+    _cropAreaPath = Path()
       ..moveTo(item.leftTopX, item.leftTopY)
       ..lineTo(item.rightTopX, item.rightTopY)
       ..lineTo(item.rightBottomX, item.rightBottomY)
@@ -53,7 +51,9 @@ class _PictureCropState extends State<PictureCrop> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<ui.Image>(
-      future: _loadCropImage(),
+      future: widget.controller.isTakePicture
+          ? _loadCropImage()
+          : _loadSelectCropImage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done &&
             snapshot.hasData) {
@@ -62,10 +62,10 @@ class _PictureCropState extends State<PictureCrop> {
           return widget.isShowImage
               ? Center(
                   child: RawImage(
+                    width: widget.controller.renderBoxWidth,
+                    height: widget.controller.renderBoxHeight,
                     image: image,
-                    fit: widget.controller.isTakePicture
-                        ? BoxFit.fill
-                        : BoxFit.contain,
+                    fit: BoxFit.contain,
                   ),
                 )
               : Center(
@@ -83,88 +83,200 @@ class _PictureCropState extends State<PictureCrop> {
   }
 
   /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
+  /// takePictureImage
   Future<ui.Image> _loadCropImage() async {
     final Completer<ui.Image> completer = Completer();
     ui.decodeImageFromList(widget.controller.imageBytes,
         (ui.Image image) async {
-      final width = widget.controller.renderBoxWidth;
-      final height = widget.controller.renderBoxHeight;
-      final size = ui.Size(width, height);
+      /// STEP 1
+      /// ui.image width, height
+      final imageWidth = image.width.toDouble();
+      final imageHeight = image.height.toDouble();
 
+      /// renderBox width, height to match the ratio of _cropPathArea
+      final renderBoxWidth = widget.controller.renderBoxWidth;
+      final renderBoxHeight = widget.controller.renderBoxHeight;
+
+      /// Create a PictureRecorder to record the drawing
       final ui.PictureRecorder recorder = ui.PictureRecorder();
+
+      /// Create a canvas with the image size
       final Canvas canvas =
-          Canvas(recorder, Rect.fromLTWH(0, 0, width, height));
-      final _CropPainter painter = _CropPainter(image, _cropPath, size);
-      painter.paint(canvas, size);
+          Canvas(recorder, Rect.fromLTWH(0, 0, imageWidth, imageHeight));
 
+      /// Scale x, y for the image size relative to renderBox size
+      final double scaleX = imageWidth / renderBoxWidth;
+      final double scaleY = imageHeight / renderBoxHeight;
+
+      /// Create a matrix with the specified scale
+      final Matrix4 scaleMatrix = Matrix4.identity()..scale(scaleX, scaleY);
+
+      /// Apply _cropAreaPath to the scaleMatrix to create a new path
+      final Path imageCropAreaPath =
+          _cropAreaPath.transform(scaleMatrix.storage);
+
+      /// Draw only the area within imageCropAreaPath
+      canvas.clipPath(imageCropAreaPath);
+
+      /// Set the source area of the original image
+      final Rect srcRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
+      final Rect dstRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
+
+      /// Draw the clipped image
+      canvas.drawImageRect(image, srcRect, dstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
       final ui.Picture picture = recorder.endRecording();
-      final ui.Rect bounds = _cropPath.getBounds();
-      final ui.Image fullImage =
-          await picture.toImage(width.toInt(), height.toInt());
 
+      /// Convert the Picture object to a ui.Image
+      final ui.Image fullImage =
+          await picture.toImage(imageWidth.toInt(), imageHeight.toInt());
+
+      /// STEP 2
+      /// Create a Rect of the area corresponding to imageCropAreaPath in fullImage
+      final ui.Rect bounds = imageCropAreaPath.getBounds();
+
+      /// Create a PictureRecorder to record the drawing
       final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
+
+      /// Create a canvas with the size of the drawn area
       final Canvas croppedCanvas = Canvas(
           croppedRecorder, Rect.fromLTWH(0, 0, bounds.width, bounds.height));
 
-      final Rect srcRect =
+      /// Full area
+      final Rect croppedSrcRect =
           Rect.fromLTWH(bounds.left, bounds.top, bounds.width, bounds.height);
 
-      final Rect dstRect = Rect.fromLTWH(0, 0, bounds.width, bounds.height);
-      croppedCanvas.drawImageRect(fullImage, srcRect, dstRect, Paint());
+      /// Drawing area
+      final Rect croppedDstRect =
+          Rect.fromLTWH(0, 0, bounds.width, bounds.height);
 
+      /// Draw the cropped image
+      croppedCanvas.drawImageRect(
+          fullImage, croppedSrcRect, croppedDstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
       final ui.Picture croppedPicture = croppedRecorder.endRecording();
+
+      /// Convert the Picture object to a ui.Image
       final cropImage = await croppedPicture.toImage(
           bounds.width.toInt(), bounds.height.toInt());
 
+      /// Complete
       completer.complete(cropImage);
     });
     return completer.future;
   }
-}
 
-/// [_CropPainter] is a custom painter used for drawing an image with crop path applied.
-/// [image] is an Image created from [Uint8List] bytes.
-/// [scale] is the information about Zoom in and Zoom out during editing.
-/// [cropPath] is the coordinate information for the crop.
-/// [renderBoxSize] is the size of the drawn image.
-class _CropPainter extends CustomPainter {
-  final ui.Image image;
-  final Path cropPath;
-  final Size renderBoxSize;
+  /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
+  /// pickFromGallery
+  Future<ui.Image> _loadSelectCropImage() async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(widget.controller.imageBytes,
+        (ui.Image image) async {
+      /// STEP 1
+      /// ui.image width, height
+      final imageWidth = image.width.toDouble();
+      final imageHeight = image.height.toDouble();
 
-  _CropPainter(this.image, this.cropPath, this.renderBoxSize);
+      /// renderBox width, height to match the ratio of _cropPathArea
+      final renderBoxWidth = widget.controller.renderBoxWidth;
+      final renderBoxHeight = widget.controller.renderBoxHeight;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double imageWidth = image.width.toDouble();
-    final double imageHeight = image.height.toDouble();
+      /// Calculate the scale factors to fit the image within the render box
+      final double scaleX = renderBoxWidth / imageWidth;
+      final double scaleY = renderBoxHeight / imageHeight;
+      final double scale = scaleX < scaleY ? scaleX : scaleY;
 
-    final double scaleX = renderBoxSize.width / imageWidth;
-    final double scaleY = renderBoxSize.height / imageHeight;
-    final double scale = scaleX < scaleY ? scaleX : scaleY;
+      /// Calculate the new dimensions for the image based on the scale
+      final double fittedWidth = imageWidth * scale;
+      final double fittedHeight = imageHeight * scale;
 
-    final double scaledImageWidth = imageWidth * scale;
-    final double scaledImageHeight = imageHeight * scale;
+      /// Calculate the offsets to center the image within the render box
+      final double offsetX = (renderBoxWidth - fittedWidth) / 2;
+      final double offsetY = (renderBoxHeight - fittedHeight) / 2;
 
-    final double offsetX = (renderBoxSize.width - scaledImageWidth) / 2;
-    final double offsetY = (renderBoxSize.height - scaledImageHeight) / 2;
+      /// Calculate the margins relative to the original image size
+      final double imageOffsetX = offsetX / scale;
+      final double imageOffsetY = offsetY / scale;
 
-    final Path transformedPath = cropPath.transform(Matrix4.identity().storage);
+      /// Calculate the canvas size
+      final canvasWidth = imageWidth + (imageOffsetX * 2);
+      final canvasHeight = imageHeight + (imageOffsetY * 2);
 
-    canvas.save();
+      /// Calculate the scale factors from renderBox to canvas
+      final double canvasScaleX = canvasWidth / renderBoxWidth;
+      final double canvasScaleY = canvasHeight / renderBoxHeight;
 
-    canvas.clipPath(transformedPath);
+      /// Create a PictureRecorder to record the drawing
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
 
-    final Rect srcRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
-    final Rect dstRect =
-        Rect.fromLTWH(offsetX, offsetY, scaledImageWidth, scaledImageHeight);
-    canvas.drawImageRect(image, srcRect, dstRect, Paint());
+      /// Create a canvas with the image size
+      final Canvas canvas =
+          Canvas(recorder, Rect.fromLTWH(0, 0, canvasWidth, canvasHeight));
 
-    canvas.restore();
-  }
+      /// Set the background color to grey
+      canvas.drawRect(Rect.fromLTWH(0, 0, canvasWidth, canvasHeight), Paint());
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+      /// Create a matrix with the specified scale
+      final Matrix4 scaleMatrix = Matrix4.identity()
+        ..scale(canvasScaleX, canvasScaleY);
+
+      /// Apply the scale matrix to the cropAreaPath
+      final Path scaledCropAreaPath =
+          _cropAreaPath.transform(scaleMatrix.storage);
+
+      /// Clip the canvas to the scaled and shifted crop area path
+      canvas.clipPath(scaledCropAreaPath);
+
+      /// Set the source area of the original image
+      final Rect srcRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
+      final Rect dstRect =
+          Rect.fromLTWH(imageOffsetX, imageOffsetY, imageWidth, imageHeight);
+
+      /// Draw the clipped image
+      canvas.drawImageRect(image, srcRect, dstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
+      final ui.Picture picture = recorder.endRecording();
+
+      /// Convert the Picture object to a ui.Image
+      final ui.Image fullImage =
+          await picture.toImage(canvasWidth.toInt(), canvasHeight.toInt());
+
+      /// STEP 2
+      /// Create a Rect of the area corresponding to scaledCropAreaPath in fullImage
+      final ui.Rect bounds = scaledCropAreaPath.getBounds();
+
+      /// Create a PictureRecorder to record the drawing
+      final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
+
+      /// Create a canvas with the size of the drawn area
+      final Canvas croppedCanvas = Canvas(
+          croppedRecorder, Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+
+      /// Full area
+      final Rect croppedSrcRect =
+          Rect.fromLTWH(bounds.left, bounds.top, bounds.width, bounds.height);
+
+      /// Drawing area
+      final Rect croppedDstRect =
+          Rect.fromLTWH(0, 0, bounds.width, bounds.height);
+
+      /// Draw the cropped image
+      croppedCanvas.drawImageRect(
+          fullImage, croppedSrcRect, croppedDstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
+      final ui.Picture croppedPicture = croppedRecorder.endRecording();
+
+      /// Convert the Picture object to a ui.Image
+      final cropImage = await croppedPicture.toImage(
+          bounds.width.toInt(), bounds.height.toInt());
+
+      /// Complete
+      completer.complete(cropImage);
+    });
+    return completer.future;
   }
 }

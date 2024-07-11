@@ -64,10 +64,18 @@ late PictureEditorController pictureEditorController;
 void initState() {
   super.initState();
   pictureEditorController = PictureCropperController(
-    onSelectedImage: (Uint8List image) {
+    onSelectedImage: (Uint8List image) async {
       // Callback after capturing or selecting an image
       // If you need image bytes...
     },
+    // If return from pop method , initialize cropGuideline
+    /*onSelectedImage: (Uint8List image) async {
+      final result = await Navigator.pushNamed(context, '/editor');
+      setState(() {
+        _cropStatus = 0;
+        pictureCropperController.changeCropGuideLineType(PictureCropGuideLineType.qr);
+      });
+    },*/
   );
 }
 
@@ -87,7 +95,7 @@ Widget build(BuildContext context) {
 }
 ```
 ```dart
-// Method - pickImageFromGallery
+/// Method - pickImageFromGallery
 InkWell(
   onTap: pictureEditorController.pickImageFromGallery,
   child: const Icon(
@@ -97,7 +105,7 @@ InkWell(
   ),
 ),
 
-// Method - takePicture
+/// Method - takePicture
 InkWell(
   onTap: pictureEditorController.takePicture
   child: const Icon(
@@ -107,7 +115,7 @@ InkWell(
   ),
 ),
 
-// Method - toggleCameraDirection
+/// Method - toggleCameraDirection
 InkWell(
   onTap: pictureCropperController.toggleCameraDirection,
   child: const Icon(
@@ -133,9 +141,9 @@ Widget build(BuildContext context) {
 }
 ```
 ```dart
-// Method - toggleIrregularCrop
-// false = Ractangle Crop
-// true = Irregular Crop
+/// Method - toggleIrregularCrop
+/// false = Ractangle Crop
+/// true = Irregular Crop
 InkWell(
     onTap: () async {
     setState(() {

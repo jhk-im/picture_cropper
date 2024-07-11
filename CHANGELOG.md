@@ -1,3 +1,7 @@
+## 0.0.16
+- Improve image quality after cropping
+- Change crop editing pointer size
+
 ## 0.0.15
 - Change the camera preview screen area
 

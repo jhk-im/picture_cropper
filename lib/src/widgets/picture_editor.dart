@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../picture_cropper.dart';
-import 'crop/irregular_crop.dart';
-import 'crop/rectangle_crop.dart';
+import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
+import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
+import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 
 /// [PictureEditor] is a widget used to edit the coordinates for cropping.
 /// The [controller] is used to determine the crop type and access the crop path.
@@ -45,12 +44,13 @@ class _PictureEditorState extends State<PictureEditor> {
           final updateScale = _baseScale * details.scale;
           if (updateScale < 5 && updateScale > 0.5) {
             _scale = updateScale;
-            widget.controller.picturePathItem.scale = _scale;
+            // widget.controller.cropAreaItem.scale = _scale;
           }
           // _rotation = _baseRotation + details.rotation;
         });
       },
-      child: SizedBox(
+      child: Container(
+        color: widget.cropBackgroundColor ?? Colors.black,
         width: widget.controller.renderBoxWidth,
         height: widget.controller.renderBoxHeight,
         child: Stack(
@@ -73,24 +73,22 @@ class _PictureEditorState extends State<PictureEditor> {
                 ? IrregularCrop(
                     width: widget.controller.renderBoxWidth,
                     height: widget.controller.renderBoxHeight,
-                    picturePathItem: widget.controller.picturePathItem,
+                    picturePathItem: widget.controller.cropAreaItem,
                     backgroundColor: widget.cropBackgroundColor ??
                         Colors.black.withAlpha(180),
-                    isToggled: widget.controller.isToggled,
                     onUpdatePicturePathItem: (cropAreaClipItem) {
-                      cropAreaClipItem.scale = _scale;
+                      // cropAreaClipItem.scale = _scale;
                       widget.controller.updatePicturePathItem(cropAreaClipItem);
                     },
                   )
                 : RectangleCrop(
                     width: widget.controller.renderBoxWidth,
                     height: widget.controller.renderBoxHeight,
-                    picturePathItem: widget.controller.picturePathItem,
+                    picturePathItem: widget.controller.cropAreaItem,
                     backgroundColor: widget.cropBackgroundColor ??
                         Colors.black.withAlpha(180),
-                    isToggled: widget.controller.isToggled,
                     onUpdatePicturePathItem: (cropAreaClipItem) {
-                      cropAreaClipItem.scale = _scale;
+                      //cropAreaClipItem.scale = _scale;
                       widget.controller.updatePicturePathItem(cropAreaClipItem);
                     },
                   ),

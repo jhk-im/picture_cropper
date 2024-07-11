@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
-
-import 'crop/camera_crop_guideline.dart';
+import 'package:picture_cropper/src/widgets/crop/camera_crop_guideline.dart';
 
 /// [PicturePicker] is a widget used for taking photos and picking images from the gallery.
 /// It is recommended to use a stateful widget to ensure the camera direction toggle method functions correctly.
