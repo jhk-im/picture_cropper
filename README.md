@@ -6,15 +6,15 @@
 A Flutter package for cropping pictures, which includes features for capturing images from the camera or selecting images from the gallery.
 
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex.gif?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_01.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme.gif?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_01.png?raw=true" width="200" height="400"/>
 </p>
 
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_02.png?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_03.png?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_04.png?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/ex_05.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_02.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_03.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_04.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_05.png?raw=true" width="200" height="400"/>
 </p>
 
 ## Installation
