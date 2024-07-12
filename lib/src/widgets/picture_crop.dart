@@ -14,12 +14,14 @@ class PictureCrop extends StatefulWidget {
   final Future<void> Function(ui.Image) onCropped;
   final bool isShowImage;
   final Color? progressColor;
+  final Color? cropImageBackgroundColor;
 
   PictureCrop({
     super.key,
     required this.controller,
     this.isShowImage = true,
     this.progressColor,
+    this.cropImageBackgroundColor,
     required this.onCropped,
   });
 
@@ -103,6 +105,10 @@ class _PictureCropState extends State<PictureCrop> {
       /// Create a canvas with the image size
       final Canvas canvas =
           Canvas(recorder, Rect.fromLTWH(0, 0, imageWidth, imageHeight));
+
+      /// Set the background color
+      final paint = Paint()..color = widget.cropImageBackgroundColor ?? Colors.transparent;
+      canvas.drawRect(Rect.fromLTWH(0, 0, imageWidth, imageHeight), paint);
 
       /// Scale x, y for the image size relative to renderBox size
       final double scaleX = imageWidth / renderBoxWidth;
@@ -215,8 +221,9 @@ class _PictureCropState extends State<PictureCrop> {
       final Canvas canvas =
           Canvas(recorder, Rect.fromLTWH(0, 0, canvasWidth, canvasHeight));
 
-      /// Set the background color to grey
-      canvas.drawRect(Rect.fromLTWH(0, 0, canvasWidth, canvasHeight), Paint());
+      /// Set the background color
+      final paint = Paint()..color = widget.cropImageBackgroundColor ?? Colors.transparent;
+      canvas.drawRect(Rect.fromLTWH(0, 0, canvasWidth, canvasHeight), paint);
 
       /// Create a matrix with the specified scale
       final Matrix4 scaleMatrix = Matrix4.identity()
