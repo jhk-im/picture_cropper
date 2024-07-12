@@ -1,3 +1,8 @@
+## 0.0.17
+- Add test code
+- QA
+- Fix README.md
+
 ## 0.0.16
 - Improve image quality after cropping
 - Change crop editing pointer size

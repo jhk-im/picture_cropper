@@ -1,68 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:picture_cropper/src/common/constants.dart';
+import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
-import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
+import 'package:picture_cropper/src/model/crop_area_item.dart';
 import 'package:picture_cropper/src/widgets/crop/crop_control_point.dart';
 
-class RectangleCrop extends StatelessWidget {
-  final double width;
-  final double height;
-  final Color backgroundColor;
-  final CropAreaItem? picturePathItem;
-  final ValueChanged<CropAreaItem> onUpdatePicturePathItem;
-
-  RectangleCrop({
+class RectangleCrop extends StatefulWidget {
+  final PictureCropperController controller;
+  const RectangleCrop({
     super.key,
-    required this.width,
-    required this.height,
-    required this.backgroundColor,
-    this.picturePathItem,
-    required this.onUpdatePicturePathItem,
+    required this.controller,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return _RectangleCorpEditor(
-      onUpdateCrop: onUpdatePicturePathItem,
-      clipBehavior: Clip.hardEdge,
-      initCropItem: picturePathItem,
-      backgroundColor: backgroundColor,
-    );
-  }
+  State<RectangleCrop> createState() => _RectangleCropState();
 }
 
-class _RectangleCorpEditor extends StatefulWidget {
-  final ValueChanged<CropAreaItem> onUpdateCrop;
-  final Clip clipBehavior;
-  final CropAreaItem? initCropItem;
-  final Color backgroundColor;
-
-  const _RectangleCorpEditor({
-    required this.onUpdateCrop,
-    required this.clipBehavior,
-    required this.initCropItem,
-    required this.backgroundColor,
-  });
-
-  @override
-  _RectangleCorpEditorState createState() => _RectangleCorpEditorState();
-}
-
-class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
-  CropAreaItem _cropItem = CropAreaItem();
-
-  @override
-  void initState() {
-    if (widget.initCropItem != null) {
-      _cropItem = widget.initCropItem!;
-    }
-    super.initState();
-  }
-
+class _RectangleCropState extends State<RectangleCrop> {
   @override
   Widget build(BuildContext context) {
+    CropAreaItem _cropItem = widget.controller.cropAreaItem;
     return Stack(
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: Clip.hardEdge,
       children: [
         IgnorePointer(
           child: ClipPath(
@@ -70,7 +29,7 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
             child: Container(
               width: double.infinity,
               height: double.infinity,
-              color: widget.backgroundColor,
+              color: widget.controller.guideBackgroundColor,
             ),
           ),
         ),
@@ -106,7 +65,7 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
 
               setState(() {
                 _cropItem = update;
-                widget.onUpdateCrop(update);
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(pointShape: 1),
@@ -144,7 +103,7 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
 
               setState(() {
                 _cropItem = update;
-                widget.onUpdateCrop(update);
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(pointShape: 2),
@@ -182,7 +141,7 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
 
               setState(() {
                 _cropItem = update;
-                widget.onUpdateCrop(update);
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(pointShape: 3),
@@ -220,7 +179,7 @@ class _RectangleCorpEditorState extends State<_RectangleCorpEditor> {
 
               setState(() {
                 _cropItem = update;
-                widget.onUpdateCrop(update);
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(pointShape: 4),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
+import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
 import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 
@@ -8,12 +8,12 @@ import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 /// [cropBackgroundColor] determines the background color during cropping.
 class PictureEditor extends StatefulWidget {
   final PictureCropperController controller;
-  final Color? cropBackgroundColor;
+  final Color imageBackgroundColor;
 
   const PictureEditor({
     super.key,
     required this.controller,
-    this.cropBackgroundColor,
+    this.imageBackgroundColor = Colors.transparent,
   });
 
   @override
@@ -23,6 +23,22 @@ class PictureEditor extends StatefulWidget {
 class _PictureEditorState extends State<PictureEditor> {
   double _scale = 1.0;
   double _baseScale = 1.0;
+
+  @override
+  void initState() {
+    widget.controller.addListener(_controllerListener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_controllerListener);
+    super.dispose();
+  }
+
+  void _controllerListener() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +66,7 @@ class _PictureEditorState extends State<PictureEditor> {
         });
       },
       child: Container(
-        color: widget.cropBackgroundColor ?? Colors.black,
+        color: widget.imageBackgroundColor,
         width: widget.controller.renderBoxWidth,
         height: widget.controller.renderBoxHeight,
         child: Stack(
@@ -64,34 +80,12 @@ class _PictureEditorState extends State<PictureEditor> {
                 widget.controller.imageBytes,
                 width: widget.controller.renderBoxWidth,
                 height: widget.controller.renderBoxHeight,
-                fit: widget.controller.isTakePicture
-                    ? BoxFit.fill
-                    : BoxFit.contain,
+                fit: BoxFit.contain,
               ),
             ),
             widget.controller.isIrregularCrop
-                ? IrregularCrop(
-                    width: widget.controller.renderBoxWidth,
-                    height: widget.controller.renderBoxHeight,
-                    picturePathItem: widget.controller.cropAreaItem,
-                    backgroundColor: widget.cropBackgroundColor ??
-                        Colors.black.withAlpha(180),
-                    onUpdatePicturePathItem: (cropAreaClipItem) {
-                      // cropAreaClipItem.scale = _scale;
-                      widget.controller.updatePicturePathItem(cropAreaClipItem);
-                    },
-                  )
-                : RectangleCrop(
-                    width: widget.controller.renderBoxWidth,
-                    height: widget.controller.renderBoxHeight,
-                    picturePathItem: widget.controller.cropAreaItem,
-                    backgroundColor: widget.cropBackgroundColor ??
-                        Colors.black.withAlpha(180),
-                    onUpdatePicturePathItem: (cropAreaClipItem) {
-                      //cropAreaClipItem.scale = _scale;
-                      widget.controller.updatePicturePathItem(cropAreaClipItem);
-                    },
-                  ),
+                ? IrregularCrop(controller: widget.controller)
+                : RectangleCrop(controller: widget.controller),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:picture_cropper/src/controllers/picture_cropper_controller.dart';
+import 'package:picture_cropper/picture_cropper.dart';
+import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/camera_crop_guideline.dart';
 
 /// [PicturePicker] is a widget used for taking photos and picking images from the gallery.
@@ -30,17 +31,17 @@ class PicturePicker extends StatefulWidget {
 class _PicturePickerState extends State<PicturePicker> {
   @override
   void initState() {
-    widget.controller.addListener(_initializeCamera);
+    widget.controller.addListener(_controllerListener);
     super.initState();
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_initializeCamera);
+    widget.controller.removeListener(_controllerListener);
     super.dispose();
   }
 
-  void _initializeCamera() {
+  void _controllerListener() {
     setState(() {});
   }
 
@@ -61,8 +62,12 @@ class _PicturePickerState extends State<PicturePicker> {
                     previewSize.width / previewSize.height;
                 final double width = renderBoxSize.width;
                 final double height = width * aspectRatio;
-                widget.controller.setRenderBoxSizeAndGuidelineMargin(
-                    width, height, widget.guideLineMargin);
+
+                widget.controller.initialCropData(
+                    renderBoxWidth: width,
+                    renderBoxHeight: height,
+                    guidelineMargin: widget.guideLineMargin,
+                    guidelineRadius: widget.guideLineRadius);
 
                 return Stack(
                   children: [
@@ -71,18 +76,12 @@ class _PicturePickerState extends State<PicturePicker> {
                       width: width,
                       height: height,
                       child: CameraCropGuideline(
-                        cropGuideLineType: widget.controller.cropGuideType,
-                        backgroundWidth: width,
-                        backgroundHeight: height,
-                        radius: widget.guideLineRadius,
-                        margin: widget.guideLineMargin,
-                        backgroundColor: widget.guideLineBackgroundColor ??
-                            Colors.black.withAlpha(180),
-                        onUpdatePicturePathItem: (picturePathItem) {
-                          widget.controller
-                              .updatePicturePathItem(picturePathItem);
-                        },
-                      ),
+                          cropGuideLineType:
+                              widget.controller.cropGuidelineType,
+                          cropAreaItem: widget.controller.cropAreaItem,
+                          radius: widget.controller.guidelineRadius,
+                          backgroundColor: widget.guideLineBackgroundColor ??
+                              Colors.black.withAlpha(180)),
                     ),
                   ],
                 );

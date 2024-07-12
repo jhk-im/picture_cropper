@@ -1,100 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:picture_cropper/src/common/constants.dart';
+import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
-import 'package:picture_cropper/src/widgets/crop/crop_area_item.dart';
+import 'package:picture_cropper/src/model/crop_area_item.dart';
 import 'package:picture_cropper/src/widgets/crop/crop_control_point.dart';
 
-class IrregularCrop extends StatelessWidget {
-  final double width;
-  final double height;
-  final Color backgroundColor;
-  final CropAreaItem? picturePathItem;
-  final ValueChanged<CropAreaItem> onUpdatePicturePathItem;
-
-  IrregularCrop({
+class IrregularCrop extends StatefulWidget {
+  final PictureCropperController controller;
+  const IrregularCrop({
     super.key,
-    required this.width,
-    required this.height,
-    required this.backgroundColor,
-    this.picturePathItem,
-    required this.onUpdatePicturePathItem,
+    required this.controller,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return _IrregularCorpEditor(
-      onUpdateCrop: onUpdatePicturePathItem,
-      clipBehavior: Clip.hardEdge,
-      initCropItem: picturePathItem,
-      backgroundColor: backgroundColor,
-    );
-  }
+  State<IrregularCrop> createState() => _IrregularCropState();
 }
 
-class _IrregularCorpEditor extends StatefulWidget {
-  final ValueChanged<CropAreaItem> onUpdateCrop;
-  final Clip clipBehavior;
-  final CropAreaItem? initCropItem;
-  final Color backgroundColor;
-
-  const _IrregularCorpEditor({
-    required this.onUpdateCrop,
-    required this.clipBehavior,
-    required this.initCropItem,
-    required this.backgroundColor,
-  });
-
-  @override
-  _IrregularCorpEditorState createState() => _IrregularCorpEditorState();
-}
-
-class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
-  CropAreaItem _cropItem = CropAreaItem();
-
-  @override
-  void initState() {
-    if (widget.initCropItem != null) {
-      _cropItem = widget.initCropItem!;
-    }
-    super.initState();
-  }
-
+class _IrregularCropState extends State<IrregularCrop> {
   @override
   Widget build(BuildContext context) {
+    CropAreaItem cropItem = widget.controller.cropAreaItem;
+
     return Stack(
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: Clip.hardEdge,
       children: [
         IgnorePointer(
           child: ClipPath(
-            clipper: CropAreaClipper(_cropItem),
+            clipper: CropAreaClipper(cropItem),
             child: Container(
               width: double.infinity,
               height: double.infinity,
-              color: widget.backgroundColor,
+              color: widget.controller.guideBackgroundColor,
             ),
           ),
         ),
         Positioned(
           // leftTop
-          left: _cropItem.leftTopX - (controlPointSize / 2),
-          top: _cropItem.leftTopY - (controlPointSize / 2),
+          left: cropItem.leftTopX - (controlPointSize / 2),
+          top: cropItem.leftTopY - (controlPointSize / 2),
           child: GestureDetector(
             onPanUpdate: (details) {
               RenderBox box = context.findRenderObject() as RenderBox;
               Offset localPosition = box.globalToLocal(details.globalPosition);
 
-              print(localPosition);
-
               final dx = localPosition.dx;
               final dy = localPosition.dy;
               final screenWidth = box.size.width - irregularCropItemLimit;
               final screenHeight = box.size.height - irregularCropItemLimit;
-              final limitX = _cropItem.rightTopX - irregularCropItemLimit;
-              final limitY = _cropItem.leftBottomY - irregularCropItemLimit;
+              final limitX = cropItem.rightTopX - irregularCropItemLimit;
+              final limitY = cropItem.leftBottomY - irregularCropItemLimit;
               final crossLimitX =
-                  _cropItem.rightBottomX - irregularCropItemLimit;
+                  cropItem.rightBottomX - irregularCropItemLimit;
               final crossLimitY =
-                  _cropItem.rightBottomY - irregularCropItemLimit;
+                  cropItem.rightBottomY - irregularCropItemLimit;
 
               final limitLeftTop =
                   dx < irregularCropItemLimit || dy < irregularCropItemLimit;
@@ -109,17 +67,17 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               final update = CropAreaItem(
                 leftTopX: dx,
                 leftTopY: dy,
-                rightTopX: _cropItem.rightTopX,
-                rightTopY: _cropItem.rightTopY,
-                rightBottomX: _cropItem.rightBottomX,
-                rightBottomY: _cropItem.rightBottomY,
-                leftBottomX: _cropItem.leftBottomX,
-                leftBottomY: _cropItem.leftBottomY,
+                rightTopX: cropItem.rightTopX,
+                rightTopY: cropItem.rightTopY,
+                rightBottomX: cropItem.rightBottomX,
+                rightBottomY: cropItem.rightBottomY,
+                leftBottomX: cropItem.leftBottomX,
+                leftBottomY: cropItem.leftBottomY,
               );
 
               setState(() {
-                _cropItem = update;
-                widget.onUpdateCrop(update);
+                cropItem = update;
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(),
@@ -127,8 +85,8 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
         ),
         Positioned(
           // rightTop
-          left: _cropItem.rightTopX - (controlPointSize / 2),
-          top: _cropItem.rightTopY - (controlPointSize / 2),
+          left: cropItem.rightTopX - (controlPointSize / 2),
+          top: cropItem.rightTopY - (controlPointSize / 2),
           child: GestureDetector(
             onPanUpdate: (details) {
               RenderBox box = context.findRenderObject() as RenderBox;
@@ -138,11 +96,10 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               final dy = localPosition.dy;
               final screenWidth = box.size.width - irregularCropItemLimit;
               final screenHeight = box.size.height - irregularCropItemLimit;
-              final limitX = _cropItem.leftTopX + irregularCropItemLimit;
-              final limitY = _cropItem.rightBottomY - irregularCropItemLimit;
-              final crossLimitX =
-                  _cropItem.leftBottomX + irregularCropItemLimit;
-              final crossLimitY = _cropItem.leftBottomY;
+              final limitX = cropItem.leftTopX + irregularCropItemLimit;
+              final limitY = cropItem.rightBottomY - irregularCropItemLimit;
+              final crossLimitX = cropItem.leftBottomX + irregularCropItemLimit;
+              final crossLimitY = cropItem.leftBottomY;
 
               final limitLeftTop =
                   dx < irregularCropItemLimit || dy < irregularCropItemLimit;
@@ -155,19 +112,19 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               }
 
               final update = CropAreaItem(
-                leftTopX: _cropItem.leftTopX,
-                leftTopY: _cropItem.leftTopY,
+                leftTopX: cropItem.leftTopX,
+                leftTopY: cropItem.leftTopY,
                 rightTopX: dx,
                 rightTopY: dy,
-                rightBottomX: _cropItem.rightBottomX,
-                rightBottomY: _cropItem.rightBottomY,
-                leftBottomX: _cropItem.leftBottomX,
-                leftBottomY: _cropItem.leftBottomY,
+                rightBottomX: cropItem.rightBottomX,
+                rightBottomY: cropItem.rightBottomY,
+                leftBottomX: cropItem.leftBottomX,
+                leftBottomY: cropItem.leftBottomY,
               );
 
               setState(() {
-                _cropItem = update;
-                widget.onUpdateCrop(update);
+                cropItem = update;
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(),
@@ -175,8 +132,8 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
         ),
         Positioned(
           // rightBottom
-          left: _cropItem.rightBottomX - (controlPointSize / 2),
-          top: _cropItem.rightBottomY - (controlPointSize / 2),
+          left: cropItem.rightBottomX - (controlPointSize / 2),
+          top: cropItem.rightBottomY - (controlPointSize / 2),
           child: GestureDetector(
             onPanUpdate: (details) {
               RenderBox box = context.findRenderObject() as RenderBox;
@@ -186,10 +143,10 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               final dy = localPosition.dy;
               final screenWidth = box.size.width - irregularCropItemLimit;
               final screenHeight = box.size.height - irregularCropItemLimit;
-              final limitX = _cropItem.leftBottomX + irregularCropItemLimit;
-              final limitY = _cropItem.rightTopY + irregularCropItemLimit;
-              final crossLimitX = _cropItem.leftTopX + irregularCropItemLimit;
-              final crossLimitY = _cropItem.leftTopY + irregularCropItemLimit;
+              final limitX = cropItem.leftBottomX + irregularCropItemLimit;
+              final limitY = cropItem.rightTopY + irregularCropItemLimit;
+              final crossLimitX = cropItem.leftTopX + irregularCropItemLimit;
+              final crossLimitY = cropItem.leftTopY + irregularCropItemLimit;
 
               final limitLeftTop =
                   dx < irregularCropItemLimit || dy < irregularCropItemLimit;
@@ -202,19 +159,19 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               }
 
               final update = CropAreaItem(
-                leftTopX: _cropItem.leftTopX,
-                leftTopY: _cropItem.leftTopY,
-                rightTopX: _cropItem.rightTopX,
-                rightTopY: _cropItem.rightTopY,
+                leftTopX: cropItem.leftTopX,
+                leftTopY: cropItem.leftTopY,
+                rightTopX: cropItem.rightTopX,
+                rightTopY: cropItem.rightTopY,
                 rightBottomX: dx,
                 rightBottomY: dy,
-                leftBottomX: _cropItem.leftBottomX,
-                leftBottomY: _cropItem.leftBottomY,
+                leftBottomX: cropItem.leftBottomX,
+                leftBottomY: cropItem.leftBottomY,
               );
 
               setState(() {
-                _cropItem = update;
-                widget.onUpdateCrop(update);
+                cropItem = update;
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(),
@@ -222,8 +179,8 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
         ),
         Positioned(
           // leftBottom
-          left: _cropItem.leftBottomX - (controlPointSize / 2),
-          top: _cropItem.leftBottomY - (controlPointSize / 2),
+          left: cropItem.leftBottomX - (controlPointSize / 2),
+          top: cropItem.leftBottomY - (controlPointSize / 2),
           child: GestureDetector(
             onPanUpdate: (details) {
               RenderBox box = context.findRenderObject() as RenderBox;
@@ -233,10 +190,10 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               final dy = localPosition.dy;
               final screenWidth = box.size.width - irregularCropItemLimit;
               final screenHeight = box.size.height - irregularCropItemLimit;
-              final limitX = _cropItem.rightBottomX - irregularCropItemLimit;
-              final limitY = _cropItem.leftTopY + irregularCropItemLimit;
-              final crossLimitX = _cropItem.rightTopX - irregularCropItemLimit;
-              final crossLimitY = _cropItem.rightTopY + irregularCropItemLimit;
+              final limitX = cropItem.rightBottomX - irregularCropItemLimit;
+              final limitY = cropItem.leftTopY + irregularCropItemLimit;
+              final crossLimitX = cropItem.rightTopX - irregularCropItemLimit;
+              final crossLimitY = cropItem.rightTopY + irregularCropItemLimit;
 
               final limitLeftTop =
                   dx < irregularCropItemLimit || dy < irregularCropItemLimit;
@@ -249,19 +206,19 @@ class _IrregularCorpEditorState extends State<_IrregularCorpEditor> {
               }
 
               final update = CropAreaItem(
-                leftTopX: _cropItem.leftTopX,
-                leftTopY: _cropItem.leftTopY,
-                rightTopX: _cropItem.rightTopX,
-                rightTopY: _cropItem.rightTopY,
-                rightBottomX: _cropItem.rightBottomX,
-                rightBottomY: _cropItem.rightBottomY,
+                leftTopX: cropItem.leftTopX,
+                leftTopY: cropItem.leftTopY,
+                rightTopX: cropItem.rightTopX,
+                rightTopY: cropItem.rightTopY,
+                rightBottomX: cropItem.rightBottomX,
+                rightBottomY: cropItem.rightBottomY,
                 leftBottomX: dx,
                 leftBottomY: dy,
               );
 
               setState(() {
-                _cropItem = update;
-                widget.onUpdateCrop(update);
+                cropItem = update;
+                widget.controller.updateCropAreaItem(update);
               });
             },
             child: CropControlPoint(),

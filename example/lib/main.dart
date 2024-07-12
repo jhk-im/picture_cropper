@@ -48,11 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
       onSelectedImage: (Uint8List image) async {
         final result = await Navigator.pushNamed(context, '/editor');
         if (result == true) {
-          setState(() {
-            _cropStatus = 0;
-            pictureCropperController
-                .changeCropGuideLineType(PictureCropGuideLineType.qr);
-          });
+          pictureCropperController.changeCropGuideLineType(
+              pictureCropperController.cropGuidelineType);
         }
       },
     );
@@ -82,8 +79,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 0;
-                        pictureCropperController.changeCropGuideLineType(
-                            PictureCropGuideLineType.qr);
+                        pictureCropperController
+                            .changeCropGuideLineType(CropGuideLineType.qr);
                       });
                     },
                     child: Icon(
@@ -96,8 +93,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 1;
-                        pictureCropperController.changeCropGuideLineType(
-                            PictureCropGuideLineType.card);
+                        pictureCropperController
+                            .changeCropGuideLineType(CropGuideLineType.card);
                       });
                     },
                     child: Icon(
@@ -110,8 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 2;
-                        pictureCropperController.changeCropGuideLineType(
-                            PictureCropGuideLineType.clear);
+                        pictureCropperController
+                            .changeCropGuideLineType(CropGuideLineType.clear);
                       });
                     },
                     child: Icon(
