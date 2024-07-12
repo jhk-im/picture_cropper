@@ -6,7 +6,8 @@ import 'package:picture_cropper/src/widgets/crop/crop_area_clipper.dart';
 import 'package:picture_cropper/src/model/crop_area_item.dart';
 
 void main() {
-  testWidgets('CameraCropGuideline renders correctly', (WidgetTester tester) async {
+  testWidgets('CameraCropGuideline renders correctly',
+      (WidgetTester tester) async {
     final cropAreaItem = CropAreaItem(
       leftTopX: 10.0,
       leftTopY: 10.0,
@@ -42,11 +43,13 @@ void main() {
     expect(cropAreaClipper.item, cropAreaItem);
     expect(cropAreaClipper.radius, 10.0);
 
-    final containerWidget = tester.widget<Container>(find.descendant(of: find.byType(ClipPath), matching: find.byType(Container)));
+    final containerWidget = tester.widget<Container>(find.descendant(
+        of: find.byType(ClipPath), matching: find.byType(Container)));
     expect(containerWidget.color, Colors.black.withOpacity(0.5));
   });
 
-  testWidgets('CameraCropGuideline hides guideline when type is clear', (WidgetTester tester) async {
+  testWidgets('CameraCropGuideline hides guideline when type is clear',
+      (WidgetTester tester) async {
     final cropAreaItem = CropAreaItem(
       leftTopX: 10.0,
       leftTopY: 10.0,

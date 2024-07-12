@@ -25,30 +25,51 @@ void main() {
     final path = clipper.getClip(Size(200.0, 200.0));
 
     final expectedPath = Path()
-      ..moveTo(20.0, 10.0) /// Starting point, a point radius away from the top-left corner
-      ..lineTo(90.0, 10.0) /// Draw a line to a point radius away from the top-right corner
-      ..arcToPoint( /// Draw an arc with a radius of 10 to move to the top-right corner
+      ..moveTo(20.0, 10.0)
+
+      /// Starting point, a point radius away from the top-left corner
+      ..lineTo(90.0, 10.0)
+
+      /// Draw a line to a point radius away from the top-right corner
+      ..arcToPoint(
+        /// Draw an arc with a radius of 10 to move to the top-right corner
         Offset(100.0, 20.0),
         radius: Radius.circular(10.0),
       )
-      ..lineTo(100.0, 90.0) /// Draw a line to a point radius away from the bottom-right corner
-      ..arcToPoint( /// Draw an arc with a radius of 10 to move to the bottom-right corner
+      ..lineTo(100.0, 90.0)
+
+      /// Draw a line to a point radius away from the bottom-right corner
+      ..arcToPoint(
+        /// Draw an arc with a radius of 10 to move to the bottom-right corner
         Offset(90.0, 100.0),
         radius: Radius.circular(10.0),
       )
-      ..lineTo(20.0, 100.0) /// Draw a line to a point radius away from the bottom-left corner
-      ..arcToPoint( /// Draw an arc with a radius of 10 to move to the bottom-left corner
+      ..lineTo(20.0, 100.0)
+
+      /// Draw a line to a point radius away from the bottom-left corner
+      ..arcToPoint(
+        /// Draw an arc with a radius of 10 to move to the bottom-left corner
         Offset(10.0, 90.0),
         radius: Radius.circular(10.0),
       )
-      ..lineTo(10.0, 20.0) /// Draw a line to a point radius away from the starting point
+      ..lineTo(10.0, 20.0)
+
+      /// Draw a line to a point radius away from the starting point
       ..arcToPoint(
-        Offset(20.0, 10.0), /// Draw an arc with a radius of 10 to move back to the starting point
+        Offset(20.0, 10.0),
+
+        /// Draw an arc with a radius of 10 to move back to the starting point
         radius: Radius.circular(10.0),
       )
-      ..close() /// Close the path
-      ..addRect(Rect.fromLTWH(0.0, 0.0, 200.0, 200.0)) /// Add the entire area to differentiate the clipping area
-      ..fillType = PathFillType.evenOdd; /// Fill the outside area
+      ..close()
+
+      /// Close the path
+      ..addRect(Rect.fromLTWH(0.0, 0.0, 200.0, 200.0))
+
+      /// Add the entire area to differentiate the clipping area
+      ..fillType = PathFillType.evenOdd;
+
+    /// Fill the outside area
 
     /// Compare path and expectedPath
     expect(path.getBounds(), expectedPath.getBounds());
