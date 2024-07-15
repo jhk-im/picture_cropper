@@ -24,6 +24,57 @@ class _IrregularCropState extends State<IrregularCrop> {
     return Stack(
       clipBehavior: Clip.hardEdge,
       children: [
+        GestureDetector(
+          onPanUpdate: (details) {
+            RenderBox box = context.findRenderObject() as RenderBox;
+            Offset localPosition = box.globalToLocal(details.globalPosition);
+
+            final dx = localPosition.dx;
+            final dy = localPosition.dy;
+
+            if (cropItem.leftTopX < dx &&
+                cropItem.leftTopY < dy &&
+                cropItem.rightTopX > dx &&
+                cropItem.rightTopY < dy &&
+                cropItem.rightBottomX > dx &&
+                cropItem.rightBottomY > dy &&
+                cropItem.leftBottomX < dx &&
+                cropItem.leftBottomY > dy) {
+              final limitRightX = box.size.width - cropLimit;
+              final limitBottomY = box.size.height - cropLimit;
+
+              final update = CropAreaItem(
+                leftTopX: cropItem.leftTopX + details.delta.dx,
+                leftTopY: cropItem.leftTopY + details.delta.dy,
+                rightTopX: cropItem.rightTopX + details.delta.dx,
+                rightTopY: cropItem.rightTopY + details.delta.dy,
+                rightBottomX: cropItem.rightBottomX + details.delta.dx,
+                rightBottomY: cropItem.rightBottomY + details.delta.dy,
+                leftBottomX: cropItem.leftBottomX + details.delta.dx,
+                leftBottomY: cropItem.leftBottomY + details.delta.dy,
+              );
+
+              if (update.leftTopX > cropLimit &&
+                  update.leftTopY > cropLimit &&
+                  update.rightTopX < limitRightX &&
+                  update.rightTopY > cropLimit &&
+                  update.rightBottomX < limitRightX &&
+                  update.rightBottomY < limitBottomY &&
+                  update.leftBottomX > cropLimit &&
+                  update.leftBottomY < limitBottomY) {
+                setState(() {
+                  cropItem = update;
+                  widget.controller.updateCropAreaItem(update);
+                });
+              }
+            }
+          },
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Colors.transparent,
+          ),
+        ),
         IgnorePointer(
           child: ClipPath(
             clipper: CropAreaClipper(cropItem),

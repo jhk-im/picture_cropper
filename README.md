@@ -10,9 +10,14 @@ A Flutter package for cropping pictures, which includes features for capturing i
   <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_01.png?raw=true" width="200" height="400"/>
 </p>
 
+Irregular Crop
 <p>
   <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_02.png?raw=true" width="200" height="400"/>
   <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_03.png?raw=true" width="200" height="400"/>
+</p>
+
+Rectangle Crop
+<p>
   <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_04.png?raw=true" width="200" height="400"/>
   <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_05.png?raw=true" width="200" height="400"/>
 </p>

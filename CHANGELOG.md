@@ -1,3 +1,6 @@
+## 0.0.18
+- Add crop area drag movement
+
 ## 0.0.17
 - Add test code
 - QA

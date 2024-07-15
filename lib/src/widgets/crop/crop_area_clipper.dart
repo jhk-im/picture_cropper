@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../model/crop_area_item.dart';
+import 'package:picture_cropper/src/model/crop_area_item.dart';
 
 /// [CropAreaClipper] is used to clip the crop and guideline area by converting coordinate information to a [Path].
 /// [item] is a [CropAreaItem] that contains the coordinate information.
