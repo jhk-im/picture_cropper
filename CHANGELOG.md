@@ -1,3 +1,6 @@
+## 0.0.19
+- Add verticalCard in CropGuideLineType
+
 ## 0.0.18
 - Add crop area drag movement
 

@@ -2,5 +2,6 @@
 enum CropGuideLineType {
   qr,
   card,
+  verticalCard,
   clear,
 }

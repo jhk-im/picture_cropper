@@ -39,7 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late PictureCropperController pictureCropperController;
-  int _cropStatus = 0; // 0 = qr, 1 = card, 2 = clear
+  int _cropStatus = 0; // 0 = qr, 1 = vertical card, 2 = card, 3 = clear
 
   @override
   void initState() {
@@ -93,12 +93,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         _cropStatus = 1;
-                        pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.card);
+                        pictureCropperController.changeCropGuideLineType(
+                            CropGuideLineType.verticalCard);
                       });
                     },
                     child: Icon(
-                      Icons.crop_3_2,
+                      Icons.crop_portrait,
                       color: _cropStatus == 1 ? Colors.blue : Colors.black,
                       size: 32,
                     ),
@@ -108,12 +108,26 @@ class _MyHomePageState extends State<MyHomePage> {
                       setState(() {
                         _cropStatus = 2;
                         pictureCropperController
+                            .changeCropGuideLineType(CropGuideLineType.card);
+                      });
+                    },
+                    child: Icon(
+                      Icons.crop_3_2,
+                      color: _cropStatus == 2 ? Colors.blue : Colors.black,
+                      size: 32,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _cropStatus = 3;
+                        pictureCropperController
                             .changeCropGuideLineType(CropGuideLineType.clear);
                       });
                     },
                     child: Icon(
                       Icons.not_interested,
-                      color: _cropStatus == 2 ? Colors.blue : Colors.black,
+                      color: _cropStatus == 3 ? Colors.blue : Colors.black,
                       size: 32,
                     ),
                   ),

@@ -14,6 +14,7 @@ class PicturePicker extends StatefulWidget {
   final PictureCropperController controller;
   final double guideLineRadius;
   final double guideLineMargin;
+  final double guideLineRatio;
   final Color? guideLineBackgroundColor;
 
   const PicturePicker({
@@ -21,6 +22,7 @@ class PicturePicker extends StatefulWidget {
     required this.controller,
     this.guideLineRadius = 8,
     this.guideLineMargin = 16,
+    this.guideLineRatio = 0.64,
     this.guideLineBackgroundColor,
   });
 
@@ -64,10 +66,12 @@ class _PicturePickerState extends State<PicturePicker> {
                 final double height = width * aspectRatio;
 
                 widget.controller.initialCropData(
-                    renderBoxWidth: width,
-                    renderBoxHeight: height,
-                    guidelineMargin: widget.guideLineMargin,
-                    guidelineRadius: widget.guideLineRadius);
+                  renderBoxWidth: width,
+                  renderBoxHeight: height,
+                  guidelineMargin: widget.guideLineMargin,
+                  guidelineRadius: widget.guideLineRadius,
+                  guidelineRatio: widget.guideLineRatio,
+                );
 
                 return Stack(
                   children: [

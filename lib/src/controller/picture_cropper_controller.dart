@@ -50,6 +50,10 @@ class PictureCropperController extends ChangeNotifier {
   static double _guidelineRadius = 0;
   double get guidelineRadius => _guidelineRadius;
 
+  /// [_guidelineRatio] Card Guideline ratio in [PicturePicker], [PictureEditor]
+  static double _guidelineRatio = 0;
+  double get guidelineRatio => _guidelineRatio;
+
   /// [guideBackgroundColor] Guideline backgroundColor in [PicturePicker], [PictureEditor]
   static Color _guideBackgroundColor = Colors.transparent;
   Color get guideBackgroundColor => _guideBackgroundColor;
@@ -66,12 +70,14 @@ class PictureCropperController extends ChangeNotifier {
       required double renderBoxHeight,
       required double guidelineMargin,
       required double guidelineRadius,
+      required double guidelineRatio,
       Color? guideBackgroundColor}) {
     if (_renderBoxWidth > 0) return;
     _renderBoxWidth = renderBoxWidth;
     _renderBoxHeight = renderBoxHeight;
     _guidelineMargin = guidelineMargin;
     _guidelineRadius = guidelineRadius;
+    _guidelineRatio = guidelineRatio;
     _guideBackgroundColor = guideBackgroundColor ?? Colors.black.withAlpha(180);
     changeCropGuideLineType(CropGuideLineType.qr, isInitial: true);
   }
@@ -149,31 +155,47 @@ class PictureCropperController extends ChangeNotifier {
     _cropGuidelineType = type;
 
     double qrWidth = renderBoxWidth - (guidelineMargin * 2);
+    double shortLine = qrWidth * _guidelineRatio;
+    double left = 0;
     double top = 0;
     double right = 0;
     double bottom = 0;
 
-    if (_cropGuidelineType != CropGuideLineType.card) {
-      right = renderBoxWidth - guidelineMargin;
-      top = (renderBoxHeight / 2) - (qrWidth / 2);
-      bottom = top + qrWidth;
-    } else {
-      double qrHeight = qrWidth * 0.62;
-      right = renderBoxWidth - guidelineMargin;
-      top = (renderBoxHeight / 2) - (qrHeight / 2);
-      bottom = top + qrHeight;
+    switch (_cropGuidelineType) {
+      case CropGuideLineType.qr:
+        left = guidelineMargin;
+        right = renderBoxWidth - guidelineMargin;
+        top = (renderBoxHeight - qrWidth) / 2;
+        bottom = top + qrWidth;
+      case CropGuideLineType.verticalCard:
+        left = (renderBoxWidth - shortLine) / 2;
+        right = left + shortLine;
+        top = (renderBoxHeight - qrWidth) / 2;
+        bottom = top + qrWidth;
+      case CropGuideLineType.card:
+        left = guidelineMargin;
+        right = renderBoxWidth - guidelineMargin;
+        top = (renderBoxHeight - shortLine) / 2;
+        bottom = top + shortLine;
+      default:
+        left = guidelineMargin;
+        right = renderBoxWidth - guidelineMargin;
+        top = guidelineMargin;
+        bottom = renderBoxHeight - guidelineMargin;
     }
 
     _cropAreaItem = CropAreaItem(
-      leftTopX: guidelineMargin,
+      leftTopX: left,
       leftTopY: top,
       rightTopX: right,
       rightTopY: top,
       rightBottomX: right,
       rightBottomY: bottom,
-      leftBottomX: guidelineMargin,
+      leftBottomX: left,
       leftBottomY: bottom,
     );
+
+    print('_cropAreaItem -> $_cropAreaItem');
 
     if (!isInitial) notifyListeners();
   }
