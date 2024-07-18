@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:picture_cropper/picture_cropper.dart';
 import 'package:picture_cropper/src/common/enums.dart';
 import 'package:picture_cropper/src/model/crop_area_item.dart';
 
@@ -24,9 +25,13 @@ class PictureCropperController extends ChangeNotifier {
   static CropAreaItem _cropAreaItem = CropAreaItem();
   CropAreaItem get cropAreaItem => _cropAreaItem;
 
-  /// [_imageBytes] contains the original and edited pictures as Unit8List.
+  /// [_imageBytes] contains the original pictures as Unit8List.
   static Uint8List _imageBytes = Uint8List(0);
   Uint8List get imageBytes => _imageBytes;
+
+  /// [_captureImageBytes] contains the edited pictures as Unit8List.
+  static Uint8List _captureImageBytes = Uint8List(0);
+  Uint8List get captureImageBytes => _captureImageBytes;
 
   /// [_isTakePicture] check take picture or pick from gallery,
   static bool _isTakePicture = false;
@@ -37,21 +42,21 @@ class PictureCropperController extends ChangeNotifier {
   bool get isFrontCamera => _isFrontCamera;
 
   /// [_renderBoxWidth], [_renderBoxHeight] is size of [PicturePicker], [PictureEditor], [PictureCrop] screens renderBox
-  static double _renderBoxWidth = 0;
+  static double _renderBoxWidth = 0.0;
   double get renderBoxWidth => _renderBoxWidth;
-  static double _renderBoxHeight = 0;
+  static double _renderBoxHeight = 0.0;
   double get renderBoxHeight => _renderBoxHeight;
 
   /// [_guidelineMargin] Guideline margin in [PicturePicker]
-  static double _guidelineMargin = 0;
+  static double _guidelineMargin = 0.0;
   double get guidelineMargin => _guidelineMargin;
 
   /// [_guidelineRadius] Guideline radius in [PicturePicker]
-  static double _guidelineRadius = 0;
+  static double _guidelineRadius = 0.0;
   double get guidelineRadius => _guidelineRadius;
 
   /// [_guidelineRatio] Card Guideline ratio in [PicturePicker], [PictureEditor]
-  static double _guidelineRatio = 0;
+  static double _guidelineRatio = 0.0;
   double get guidelineRatio => _guidelineRatio;
 
   /// [guideBackgroundColor] Guideline backgroundColor in [PicturePicker], [PictureEditor]
@@ -80,6 +85,44 @@ class PictureCropperController extends ChangeNotifier {
     _guidelineRatio = guidelineRatio;
     _guideBackgroundColor = guideBackgroundColor ?? Colors.black.withAlpha(180);
     changeCropGuideLineType(CropGuideLineType.qr, isInitial: true);
+  }
+
+  static double _editImageScale = 1.0;
+  double get editImageScale => _editImageScale;
+
+  static double _editImageRotate = 0.0;
+  double get editImageRotate => _editImageRotate;
+
+  static Offset _editImageOffset = Offset.zero;
+  Offset get editImageOffset => _editImageOffset;
+
+  /// This method changes the scale of image in [PictureEditor].
+  void changeEditImageScale(double scale) {
+    if (scale <= 3 || scale >= 0.3) {
+      _editImageScale = scale;
+      notifyListeners();
+    }
+  }
+
+  /// This method changes the rotate of image in [PictureEditor].
+  void changeEditImageRotate(double rotate) {
+    if (rotate <= 3.15 || rotate >= -3.15) {
+      _editImageRotate = rotate;
+      notifyListeners();
+    }
+  }
+
+  /// This method changes the offset of image in [PictureEditor].
+  void changeEditImageOffset(Offset offset) {
+    _editImageOffset = offset;
+    notifyListeners();
+  }
+
+  /// This method reset the editor data
+  void resetEditorData() {
+    _editImageScale = 1.0;
+    _editImageRotate = 0.0;
+    _editImageOffset = Offset.zero;
   }
 
   /// Used in [PicturePicker] for camera shooting.
@@ -131,6 +174,21 @@ class PictureCropperController extends ChangeNotifier {
     } catch (e) {
       print(e);
     }
+  }
+
+  /// This method is used for capture edit image in [PictureEditor]
+  void setCapturePng(Uint8List pngBytes) {
+    _captureImageBytes = pngBytes;
+  }
+
+  bool _calledCapturePng = false;
+  bool get calledCapturePng => _calledCapturePng;
+
+  /// this method is used for called capture png image in [PictureEditor]
+  void capturePng() {
+    _calledCapturePng = true;
+    notifyListeners();
+    _calledCapturePng = false;
   }
 
   /// This method is used to pick images from the gallery in [PicturePicker].

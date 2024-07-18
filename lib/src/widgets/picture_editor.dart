@@ -1,4 +1,8 @@
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
 import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
@@ -9,11 +13,13 @@ import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 class PictureEditor extends StatefulWidget {
   final PictureCropperController controller;
   final Color imageBackgroundColor;
+  final Function(Uint8List) onEditComplete;
 
   const PictureEditor({
     super.key,
     required this.controller,
     this.imageBackgroundColor = Colors.transparent,
+    required this.onEditComplete,
   });
 
   @override
@@ -21,8 +27,7 @@ class PictureEditor extends StatefulWidget {
 }
 
 class _PictureEditorState extends State<PictureEditor> {
-  double _scale = 1.0;
-  double _baseScale = 1.0;
+  final GlobalKey _globalKey = GlobalKey();
 
   @override
   void initState() {
@@ -37,7 +42,26 @@ class _PictureEditorState extends State<PictureEditor> {
   }
 
   void _controllerListener() {
-    setState(() {});
+    if (widget.controller.calledCapturePng) {
+      _capturePng();
+    } else {
+      setState(() {});
+    }
+  }
+
+  Future<void> _capturePng() async {
+    try {
+      RenderRepaintBoundary boundary = _globalKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+      widget.controller.setCapturePng(pngBytes);
+      widget.onEditComplete(pngBytes);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -49,46 +73,42 @@ class _PictureEditorState extends State<PictureEditor> {
       x = -1.0;
       y = 1.0;
     }
-
-    return GestureDetector(
-      onScaleStart: (ScaleStartDetails details) {
-        // _baseRotation = _rotation;
-        _baseScale = _scale;
-      },
-      onScaleUpdate: (ScaleUpdateDetails details) {
-        setState(() {
-          final updateScale = _baseScale * details.scale;
-          if (updateScale < 5 && updateScale > 0.5) {
-            _scale = updateScale;
-            // widget.controller.cropAreaItem.scale = _scale;
-          }
-          // _rotation = _baseRotation + details.rotation;
-        });
-      },
-      child: Container(
-        color: widget.imageBackgroundColor,
-        width: widget.controller.renderBoxWidth,
-        height: widget.controller.renderBoxHeight,
-        child: Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..scale(x, y),
-              //..rotateZ(_rotation)
-              //..scale(_scale),
-              alignment: Alignment.center,
-              child: Image.memory(
-                widget.controller.imageBytes,
-                width: widget.controller.renderBoxWidth,
-                height: widget.controller.renderBoxHeight,
-                fit: BoxFit.contain,
+    return Stack(
+      children: [
+        RepaintBoundary(
+          key: _globalKey,
+          child: ClipRect(
+            child: Container(
+              color: widget.imageBackgroundColor,
+              width: widget.controller.renderBoxWidth,
+              height: widget.controller.renderBoxHeight,
+              child: Transform(
+                transform: Matrix4.identity()
+                  ..scale(x, y)
+                  ..translate(widget.controller.editImageOffset.dx,
+                      widget.controller.editImageOffset.dy)
+                  ..scale(widget.controller.editImageScale)
+                  ..rotateZ(widget.controller.editImageRotate),
+                alignment: Alignment.center,
+                child: Image.memory(
+                  widget.controller.imageBytes,
+                  width: widget.controller.renderBoxWidth,
+                  height: widget.controller.renderBoxHeight,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-            widget.controller.isIrregularCrop
-                ? IrregularCrop(controller: widget.controller)
-                : RectangleCrop(controller: widget.controller),
-          ],
+          ),
         ),
-      ),
+        Container(
+          color: widget.imageBackgroundColor,
+          width: widget.controller.renderBoxWidth,
+          height: widget.controller.renderBoxHeight,
+          child: widget.controller.isIrregularCrop
+              ? IrregularCrop(controller: widget.controller)
+              : RectangleCrop(controller: widget.controller),
+        ),
+      ],
     );
   }
 }

@@ -62,117 +62,116 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Center(child: PicturePicker(controller: pictureCropperController)),
-            Container(
-              alignment: Alignment.topCenter,
-              height: 80,
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _cropStatus = 0;
-                        pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.qr);
-                      });
-                    },
-                    child: Icon(
-                      Icons.crop_din,
-                      color: _cropStatus == 0 ? Colors.blue : Colors.black,
-                      size: 32,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _cropStatus = 1;
-                        pictureCropperController.changeCropGuideLineType(
-                            CropGuideLineType.verticalCard);
-                      });
-                    },
-                    child: Icon(
-                      Icons.crop_portrait,
-                      color: _cropStatus == 1 ? Colors.blue : Colors.black,
-                      size: 32,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _cropStatus = 2;
-                        pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.card);
-                      });
-                    },
-                    child: Icon(
-                      Icons.crop_3_2,
-                      color: _cropStatus == 2 ? Colors.blue : Colors.black,
-                      size: 32,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _cropStatus = 3;
-                        pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.clear);
-                      });
-                    },
-                    child: Icon(
-                      Icons.not_interested,
-                      color: _cropStatus == 3 ? Colors.blue : Colors.black,
-                      size: 32,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 130,
+  Widget build(BuildContext context) => Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Center(
+                  child: PicturePicker(controller: pictureCropperController)),
+              Container(
+                alignment: Alignment.topCenter,
+                height: 80,
                 padding: const EdgeInsets.all(24),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: pictureCropperController.pickImageFromGallery,
-                      child: const Icon(
-                        Icons.photo,
-                        color: Colors.black,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _cropStatus = 0;
+                          pictureCropperController
+                              .changeCropGuideLineType(CropGuideLineType.qr);
+                        });
+                      },
+                      child: Icon(
+                        Icons.crop_din,
+                        color: _cropStatus == 0 ? Colors.blue : Colors.black,
                         size: 32,
                       ),
                     ),
-                    InkWell(
-                      onTap: pictureCropperController.takePicture,
-                      child: const Icon(
-                        Icons.camera,
-                        color: Colors.black,
-                        size: 82,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _cropStatus = 1;
+                          pictureCropperController.changeCropGuideLineType(
+                              CropGuideLineType.verticalCard);
+                        });
+                      },
+                      child: Icon(
+                        Icons.crop_portrait,
+                        color: _cropStatus == 1 ? Colors.blue : Colors.black,
+                        size: 32,
                       ),
                     ),
-                    InkWell(
-                      onTap: pictureCropperController.toggleCameraDirection,
-                      child: const Icon(
-                        Icons.cameraswitch,
-                        color: Colors.black,
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _cropStatus = 2;
+                          pictureCropperController
+                              .changeCropGuideLineType(CropGuideLineType.card);
+                        });
+                      },
+                      child: Icon(
+                        Icons.crop_3_2,
+                        color: _cropStatus == 2 ? Colors.blue : Colors.black,
+                        size: 32,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _cropStatus = 3;
+                          pictureCropperController
+                              .changeCropGuideLineType(CropGuideLineType.clear);
+                        });
+                      },
+                      child: Icon(
+                        Icons.not_interested,
+                        color: _cropStatus == 3 ? Colors.blue : Colors.black,
                         size: 32,
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 130,
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: pictureCropperController.pickImageFromGallery,
+                        child: const Icon(
+                          Icons.photo,
+                          color: Colors.black,
+                          size: 32,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: pictureCropperController.takePicture,
+                        child: const Icon(
+                          Icons.camera,
+                          color: Colors.black,
+                          size: 82,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: pictureCropperController.toggleCameraDirection,
+                        child: const Icon(
+                          Icons.cameraswitch,
+                          color: Colors.black,
+                          size: 32,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
