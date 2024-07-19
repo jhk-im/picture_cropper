@@ -18,7 +18,18 @@ class _EditorPageState extends State<EditorPage> {
       body: SafeArea(
         child: Stack(
           children: [
-            Center(child: PictureEditor(controller: pictureCropperController)),
+            Center(
+              child: PictureEditor(
+                controller: pictureCropperController,
+                onCropComplete: (image) {
+                  Navigator.pushNamed(
+                    context,
+                    '/crop',
+                    arguments: image,
+                  );
+                },
+              ),
+            ),
             Container(
               alignment: Alignment.topCenter,
               padding: const EdgeInsets.all(24),
@@ -74,13 +85,18 @@ class _EditorPageState extends State<EditorPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/crop');
-                        },
-                        child: const Icon(
-                          Icons.radio_button_checked,
-                          color: Colors.black,
-                          size: 82,
+                        onTap: pictureCropperController.createCropImage,
+                        child: ClipOval(
+                          child: Container(
+                            width: 68,
+                            height: 68,
+                            color: Colors.black,
+                            child: const Icon(
+                              Icons.cut,
+                              color: Colors.white,
+                              size: 32,
+                            ),
+                          ),
                         ),
                       ),
                     ),

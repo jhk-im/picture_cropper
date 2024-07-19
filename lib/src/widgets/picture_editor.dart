@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
@@ -5,15 +9,19 @@ import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 
 /// [PictureEditor] is a widget used to edit the coordinates for cropping.
 /// The [controller] is used to determine the crop type and access the crop path.
-/// [cropBackgroundColor] determines the background color during cropping.
+/// [imageBackgroundColor] determines the background color during cropping.
 class PictureEditor extends StatefulWidget {
   final PictureCropperController controller;
   final Color imageBackgroundColor;
+  final Color? cropImageBackgroundColor;
+  final void Function(ui.Image) onCropComplete;
 
   const PictureEditor({
     super.key,
     required this.controller,
     this.imageBackgroundColor = Colors.transparent,
+    this.cropImageBackgroundColor,
+    required this.onCropComplete,
   });
 
   @override
@@ -21,11 +29,11 @@ class PictureEditor extends StatefulWidget {
 }
 
 class _PictureEditorState extends State<PictureEditor> {
-  double _scale = 1.0;
-  double _baseScale = 1.0;
+  bool _isStackBlock = false;
 
   @override
   void initState() {
+    widget.controller.resetEditorData();
     widget.controller.addListener(_controllerListener);
     super.initState();
   }
@@ -37,7 +45,143 @@ class _PictureEditorState extends State<PictureEditor> {
   }
 
   void _controllerListener() {
-    setState(() {});
+    if (widget.controller.calledCreateCropImage) {
+      _cropImage();
+    } else {
+      setState(() {});
+    }
+  }
+
+  Future _cropImage() async {
+    setState(() {
+      _isStackBlock = true;
+    });
+    final item = widget.controller.cropAreaItem;
+    final cropAreaPath = Path()
+      ..moveTo(item.leftTopX, item.leftTopY)
+      ..lineTo(item.rightTopX, item.rightTopY)
+      ..lineTo(item.rightBottomX, item.rightBottomY)
+      ..lineTo(item.leftBottomX, item.leftBottomY)
+      ..lineTo(item.leftTopX, item.leftTopY)
+      ..close();
+    final image = await _loadCropImage(cropAreaPath);
+    widget.onCropComplete(image);
+    setState(() {
+      _isStackBlock = false;
+    });
+  }
+
+  /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
+  Future<ui.Image> _loadCropImage(Path cropAreaPath) async {
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(widget.controller.originalImageBytes,
+        (ui.Image image) async {
+      /// STEP 1
+      /// ui.image width, height
+      final imageWidth = image.width.toDouble();
+      final imageHeight = image.height.toDouble();
+
+      /// renderBox width, height to match the ratio of _cropPathArea
+      final renderBoxWidth = widget.controller.renderBoxWidth;
+      final renderBoxHeight = widget.controller.renderBoxHeight;
+
+      /// Calculate the scale factors to fit the image within the render box
+      final double scaleX = renderBoxWidth / imageWidth;
+      final double scaleY = renderBoxHeight / imageHeight;
+      final double scale = scaleX < scaleY ? scaleX : scaleY;
+
+      /// Calculate the new dimensions for the image based on the scale
+      final double fittedWidth = imageWidth * scale;
+      final double fittedHeight = imageHeight * scale;
+
+      /// Calculate the offsets to center the image within the render box
+      final double offsetX = (renderBoxWidth - fittedWidth) / 2;
+      final double offsetY = (renderBoxHeight - fittedHeight) / 2;
+
+      /// Calculate the margins relative to the original image size
+      final double imageOffsetX = offsetX / scale;
+      final double imageOffsetY = offsetY / scale;
+
+      /// Calculate the canvas size
+      final canvasWidth = imageWidth + (imageOffsetX * 2);
+      final canvasHeight = imageHeight + (imageOffsetY * 2);
+
+      /// Calculate the scale factors from renderBox to canvas
+      final double canvasScaleX = canvasWidth / renderBoxWidth;
+      final double canvasScaleY = canvasHeight / renderBoxHeight;
+
+      /// Create a PictureRecorder to record the drawing
+      final ui.PictureRecorder recorder = ui.PictureRecorder();
+
+      /// Create a canvas with the image size
+      final Canvas canvas =
+          Canvas(recorder, Rect.fromLTWH(0, 0, canvasWidth, canvasHeight));
+
+      /// Set the background color
+      final paint = Paint()
+        ..color = widget.cropImageBackgroundColor ?? Colors.transparent;
+      canvas.drawRect(Rect.fromLTWH(0, 0, canvasWidth, canvasHeight), paint);
+
+      /// Create a matrix with the specified scale
+      final Matrix4 scaleMatrix = Matrix4.identity()
+        ..scale(canvasScaleX, canvasScaleY);
+
+      /// Apply the scale matrix to the cropAreaPath
+      final Path scaledCropAreaPath =
+          cropAreaPath.transform(scaleMatrix.storage);
+
+      /// Clip the canvas to the scaled and shifted crop area path
+      canvas.clipPath(scaledCropAreaPath);
+
+      /// Set the source area of the original image
+      final Rect srcRect = Rect.fromLTWH(0, 0, imageWidth, imageHeight);
+      final Rect dstRect =
+          Rect.fromLTWH(imageOffsetX, imageOffsetY, imageWidth, imageHeight);
+
+      /// Draw the clipped image
+      canvas.drawImageRect(image, srcRect, dstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
+      final ui.Picture picture = recorder.endRecording();
+
+      /// Convert the Picture object to a ui.Image
+      final ui.Image fullImage =
+          await picture.toImage(canvasWidth.toInt(), canvasHeight.toInt());
+
+      /// STEP 2
+      /// Create a Rect of the area corresponding to scaledCropAreaPath in fullImage
+      final ui.Rect bounds = scaledCropAreaPath.getBounds();
+
+      /// Create a PictureRecorder to record the drawing
+      final ui.PictureRecorder croppedRecorder = ui.PictureRecorder();
+
+      /// Create a canvas with the size of the drawn area
+      final Canvas croppedCanvas = Canvas(
+          croppedRecorder, Rect.fromLTWH(0, 0, bounds.width, bounds.height));
+
+      /// Full area
+      final Rect croppedSrcRect =
+          Rect.fromLTWH(bounds.left, bounds.top, bounds.width, bounds.height);
+
+      /// Drawing area
+      final Rect croppedDstRect =
+          Rect.fromLTWH(0, 0, bounds.width, bounds.height);
+
+      /// Draw the cropped image
+      croppedCanvas.drawImageRect(
+          fullImage, croppedSrcRect, croppedDstRect, Paint());
+
+      /// End recording and return the Picture representing the drawing
+      final ui.Picture croppedPicture = croppedRecorder.endRecording();
+
+      /// Convert the Picture object to a ui.Image
+      final cropImage = await croppedPicture.toImage(
+          bounds.width.toInt(), bounds.height.toInt());
+
+      /// Complete
+      completer.complete(cropImage);
+    });
+    return completer.future;
   }
 
   @override
@@ -49,45 +193,41 @@ class _PictureEditorState extends State<PictureEditor> {
       x = -1.0;
       y = 1.0;
     }
-
-    return GestureDetector(
-      onScaleStart: (ScaleStartDetails details) {
-        // _baseRotation = _rotation;
-        _baseScale = _scale;
-      },
-      onScaleUpdate: (ScaleUpdateDetails details) {
-        setState(() {
-          final updateScale = _baseScale * details.scale;
-          if (updateScale < 5 && updateScale > 0.5) {
-            _scale = updateScale;
-            // widget.controller.cropAreaItem.scale = _scale;
-          }
-          // _rotation = _baseRotation + details.rotation;
-        });
-      },
-      child: Container(
-        color: widget.imageBackgroundColor,
-        width: widget.controller.renderBoxWidth,
-        height: widget.controller.renderBoxHeight,
-        child: Stack(
-          children: [
-            Transform(
-              transform: Matrix4.identity()..scale(x, y),
-              //..rotateZ(_rotation)
-              //..scale(_scale),
-              alignment: Alignment.center,
-              child: Image.memory(
-                widget.controller.imageBytes,
-                width: widget.controller.renderBoxWidth,
-                height: widget.controller.renderBoxHeight,
-                fit: BoxFit.contain,
+    return AbsorbPointer(
+      absorbing: _isStackBlock,
+      child: Stack(
+        children: [
+          ClipRect(
+            child: Container(
+              color: widget.imageBackgroundColor,
+              width: widget.controller.renderBoxWidth,
+              height: widget.controller.renderBoxHeight,
+              child: Transform(
+                transform: Matrix4.identity()
+                  ..scale(x, y)
+                  ..translate(widget.controller.editImageOffset.dx,
+                      widget.controller.editImageOffset.dy)
+                  ..scale(widget.controller.editImageScale)
+                  ..rotateZ(widget.controller.editImageRotate),
+                alignment: Alignment.center,
+                child: Image.memory(
+                  widget.controller.originalImageBytes,
+                  width: widget.controller.renderBoxWidth,
+                  height: widget.controller.renderBoxHeight,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-            widget.controller.isIrregularCrop
+          ),
+          Container(
+            color: widget.imageBackgroundColor,
+            width: widget.controller.renderBoxWidth,
+            height: widget.controller.renderBoxHeight,
+            child: widget.controller.isIrregularCrop
                 ? IrregularCrop(controller: widget.controller)
                 : RectangleCrop(controller: widget.controller),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

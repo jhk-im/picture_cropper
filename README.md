@@ -66,28 +66,10 @@ No additional configuration required.
 
 ### Example - Capturing or Selecting an Image from the Gallery
 
-*Stateful Widget Usage
+`Stateful Widget Usage`
 
 ```dart
-late PictureEditorController pictureEditorController;
-
-@override
-void initState() {
-  super.initState();
-  pictureEditorController = PictureCropperController(
-    onSelectedImage: (Uint8List image) async {
-      // Callback after capturing or selecting an image
-      // If you need image bytes...
-    },
-    // If return from pop method...
-    /*onSelectedImage: (Uint8List image) async {
-      final result = await Navigator.pushNamed(context, '/editor');
-      if (result == true) {
-        pictureCropperController.changeCropGuideLineType(pictureCropperController.cropGuidelineType);
-      }
-    },*/
-  );
-}
+final pictureCropperController = PictureCropperController(isPicker: true);
 
 @override
 void dispose() {
@@ -99,11 +81,23 @@ void dispose() {
 Widget build(BuildContext context) {
   return Scaffold(
     body: SafeArea(  
-      child: PicturePicker(controller: pictureEditorController),
+      child: PicturePicker(
+        controller: pictureEditorController,
+        /// Callback when image select is complete after pickImageFromGallery or takePicture call
+        onSetOriginalImage: () async {
+          final result = await Navigator.pushNamed(context, '/editor');
+          /// If return from pop method...
+          if (result == true) {
+            pictureCropperController.changeCropGuideLineType(
+                pictureCropperController.cropGuidelineType);
+          }
+        },
+      ),
     ),
   );
 }
 ```
+
 ```dart
 /// Method - pickImageFromGallery
 InkWell(
@@ -134,9 +128,26 @@ InkWell(
     size: 32,
   ),
 ),
+
+/// Method - changeCropGuidelineType
+InkWell(
+  onTap: () {
+    setState(() {
+      _cropStatus = 0;
+      /// qr, v-card, h-card, clear
+      pictureCropperController
+          .changeCropGuidelineType(CropGuideLineType.qr);
+    });
+  },
+  child: Icon(
+    Icons.crop_din,
+    color: _cropStatus == 0 ? Colors.blue : Colors.black,
+    size: 32,
+  ),
+),
 ```
 
-### Example - Editing Image Crop Area
+### Example - Editing Image
 
 ```dart
 final pictureCropperController = PictureCropperController();
@@ -145,18 +156,35 @@ final pictureCropperController = PictureCropperController();
 Widget build(BuildContext context) {
   return Scaffold(
     body: SafeArea(
-      child: PictureProEditor(controller: pictureEditorController),
+      child: PictureEditor(
+        controller: pictureCropperController,
+        /// Callback when image creation is complete after createCropImage call
+        onCropComplete: (image) {
+          /// Use cropped images
+          Navigator.pushNamed(context, '/crop', arguments: image);
+        },
+      ),
     ),
   );
 }
 ```
+
 ```dart
-/// Method - toggleIrregularCrop
-/// false = Ractangle Crop
-/// true = Irregular Crop
+/// Method - createCropImage
 InkWell(
-    onTap: () async {
+  onTap: pictureCropperController.createCropImage,
+child: const Icon(
+    Icons.cut,
+    color: Colors.white,
+    size: 32,
+  ),
+),
+
+/// Method - toggleIrregularCrop
+InkWell(
+  onTap: () async {
     setState(() {
+      /// false = Rectangle Crop, true = Irregular Crop
       pictureEditorController.toggleIrregularCrop(false);
       _isIrregularCrop = false;
     });
@@ -167,26 +195,6 @@ InkWell(
     size: 32,
   ),
 ),
-```
-
-### Example -  Cropping Image
-
-```dart
-final pictureCropperController = PictureCropperController();
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: SafeArea(
-      child: PictureCrop(
-        controller: pictureEditorController,
-        onCropped: (uiImage) {
-          // If you need uiImage ...
-        }
-      ),
-    ),
-  );
-}
 ```
 
 ```txt

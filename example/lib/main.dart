@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:example/crop_image_page.dart';
 import 'package:example/editor_page.dart';
@@ -24,7 +24,18 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const MyHomePage(),
         '/editor': (context) => const EditorPage(),
-        '/crop': (context) => const CropImagePage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/crop') {
+          final image = settings.arguments as ui.Image;
+          return MaterialPageRoute(
+            builder: (context) {
+              return CropImagePage(image: image);
+            },
+          );
+        }
+        assert(false, 'Need to implement ${settings.name}');
+        return null;
       },
     );
   }
@@ -38,22 +49,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late PictureCropperController pictureCropperController;
+  final pictureCropperController = PictureCropperController(isPicker: true);
   int _cropStatus = 0; // 0 = qr, 1 = vertical card, 2 = card, 3 = clear
-
-  @override
-  void initState() {
-    super.initState();
-    pictureCropperController = PictureCropperController(
-      onSelectedImage: (Uint8List image) async {
-        final result = await Navigator.pushNamed(context, '/editor');
-        if (result == true) {
-          pictureCropperController.changeCropGuideLineType(
-              pictureCropperController.cropGuidelineType);
-        }
-      },
-    );
-  }
 
   @override
   void dispose() {
@@ -67,7 +64,18 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: Stack(
           children: [
-            Center(child: PicturePicker(controller: pictureCropperController)),
+            Center(
+              child: PicturePicker(
+                controller: pictureCropperController,
+                onSetOriginalImage: () async {
+                  final result = await Navigator.pushNamed(context, '/editor');
+                  if (result == true) {
+                    pictureCropperController.changeCropGuidelineType(
+                        pictureCropperController.cropGuidelineType);
+                  }
+                },
+              ),
+            ),
             Container(
               alignment: Alignment.topCenter,
               height: 80,
@@ -75,12 +83,12 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         _cropStatus = 0;
                         pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.qr);
+                            .changeCropGuidelineType(CropGuideLineType.qr);
                       });
                     },
                     child: Icon(
@@ -89,11 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       size: 32,
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         _cropStatus = 1;
-                        pictureCropperController.changeCropGuideLineType(
+                        pictureCropperController.changeCropGuidelineType(
                             CropGuideLineType.verticalCard);
                       });
                     },
@@ -103,12 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       size: 32,
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         _cropStatus = 2;
                         pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.card);
+                            .changeCropGuidelineType(CropGuideLineType.card);
                       });
                     },
                     child: Icon(
@@ -117,12 +125,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       size: 32,
                     ),
                   ),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       setState(() {
                         _cropStatus = 3;
                         pictureCropperController
-                            .changeCropGuideLineType(CropGuideLineType.clear);
+                            .changeCropGuidelineType(CropGuideLineType.clear);
                       });
                     },
                     child: Icon(
@@ -161,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     InkWell(
                       onTap: pictureCropperController.toggleCameraDirection,
                       child: const Icon(
-                        Icons.cameraswitch,
+                        Icons.change_circle,
                         color: Colors.black,
                         size: 32,
                       ),

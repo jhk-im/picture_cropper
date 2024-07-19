@@ -6,24 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:picture_cropper/picture_cropper.dart';
 
 class CropImagePage extends StatefulWidget {
-  const CropImagePage({super.key});
+  final ui.Image image;
+  const CropImagePage({super.key, required this.image});
 
   @override
   State<CropImagePage> createState() => _CropImagePageState();
 }
 
 class _CropImagePageState extends State<CropImagePage> {
-  PictureCropperController pictureCropperController =
-      PictureCropperController();
-  ui.Image? _image;
-
   Future<void> saveImage() async {
     try {
       final ByteData? byteData =
-          await _image?.toByteData(format: ui.ImageByteFormat.png);
+          await widget.image.toByteData(format: ui.ImageByteFormat.png);
       final Uint8List? buffer = byteData?.buffer.asUint8List();
 
       DateTime now = DateTime.now();
@@ -41,7 +37,9 @@ class _CropImagePageState extends State<CropImagePage> {
       );
 
       // Find the ScaffoldMessenger in the widget tree and use it to show a SnackBar.
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     } catch (e) {
       print(e);
     }
@@ -54,12 +52,42 @@ class _CropImagePageState extends State<CropImagePage> {
         child: Stack(
           children: [
             Center(
-              child: PictureCrop(
-                controller: pictureCropperController,
-                onCropped: (uiImage) async {
-                  /// If you need uiImage ...
-                  _image = uiImage;
-                },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.black,
+                width: double.maxFinite,
+                height: 300,
+                child: RawImage(
+                  image: widget.image,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Container(
+              alignment: Alignment.topCenter,
+              padding: const EdgeInsets.all(24),
+              height: 80,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 32,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: saveImage,
+                    child: const Icon(
+                      Icons.file_download,
+                      size: 32,
+                    ),
+                  ),
+                ],
               ),
             ),
             Align(
@@ -67,36 +95,24 @@ class _CropImagePageState extends State<CropImagePage> {
               child: Container(
                 height: 130,
                 padding: const EdgeInsets.all(24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Icon(
-                        Icons.arrow_back,
+                child: Center(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/');
+                    },
+                    child: ClipOval(
+                      child: Container(
+                        width: 68,
+                        height: 68,
                         color: Colors.black,
-                        size: 32,
+                        child: const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 32,
+                        ),
                       ),
                     ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(context, '/');
-                      },
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 82,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: saveImage,
-                      child: const Icon(
-                        Icons.save_alt,
-                        size: 32,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -1,3 +1,6 @@
+## 0.1.0
+- Change crop internal logic
+
 ## 0.0.19
 - Add verticalCard in CropGuideLineType
 
