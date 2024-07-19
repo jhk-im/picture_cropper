@@ -20,7 +20,6 @@ class _IrregularCropState extends State<IrregularCrop> {
   @override
   Widget build(BuildContext context) {
     CropAreaItem cropItem = widget.controller.cropAreaItem;
-
     return Stack(
       clipBehavior: Clip.hardEdge,
       children: [

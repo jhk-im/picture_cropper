@@ -48,52 +48,48 @@ class _PicturePickerState extends State<PicturePicker> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-        future: widget.controller.initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done &&
-              widget.controller.cameraController != null &&
-              widget.controller.cameraController!.value.isInitialized) {
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final renderBoxSize = constraints.biggest;
-                final previewSize =
-                    widget.controller.cameraController!.value.previewSize!;
-                final double aspectRatio =
-                    previewSize.width / previewSize.height;
-                final double width = renderBoxSize.width;
-                final double height = width * aspectRatio;
+  Widget build(BuildContext context) => FutureBuilder<void>(
+      future: widget.controller.initializeControllerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            widget.controller.cameraController != null &&
+            widget.controller.cameraController!.value.isInitialized) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final renderBoxSize = constraints.biggest;
+              final previewSize =
+                  widget.controller.cameraController!.value.previewSize!;
+              final double aspectRatio = previewSize.width / previewSize.height;
+              final double width = renderBoxSize.width;
+              final double height = width * aspectRatio;
 
-                widget.controller.initialCropData(
-                  renderBoxWidth: width,
-                  renderBoxHeight: height,
-                  guidelineMargin: widget.guideLineMargin,
-                  guidelineRadius: widget.guideLineRadius,
-                  guidelineRatio: widget.guideLineRatio,
-                );
+              widget.controller.initialCropData(
+                renderBoxWidth: width,
+                renderBoxHeight: height,
+                guidelineMargin: widget.guideLineMargin,
+                guidelineRadius: widget.guideLineRadius,
+                guidelineRatio: widget.guideLineRatio,
+              );
 
-                return Stack(
-                  children: [
-                    CameraPreview(widget.controller.cameraController!),
-                    SizedBox(
-                      width: width,
-                      height: height,
-                      child: CameraCropGuideline(
-                          cropGuideLineType:
-                              widget.controller.cropGuidelineType,
-                          cropAreaItem: widget.controller.cropAreaItem,
-                          radius: widget.controller.guidelineRadius,
-                          backgroundColor: widget.guideLineBackgroundColor ??
-                              Colors.black.withAlpha(180)),
-                    ),
-                  ],
-                );
-              },
-            );
-          } else {
-            return Container();
-          }
-        });
-  }
+              return Stack(
+                children: [
+                  CameraPreview(widget.controller.cameraController!),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child: CameraCropGuideline(
+                        cropGuideLineType: widget.controller.cropGuidelineType,
+                        cropAreaItem: widget.controller.cropAreaItem,
+                        radius: widget.controller.guidelineRadius,
+                        backgroundColor: widget.guideLineBackgroundColor ??
+                            Colors.black.withAlpha(180)),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          return Container();
+        }
+      });
 }

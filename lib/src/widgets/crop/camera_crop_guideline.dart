@@ -19,23 +19,21 @@ class CameraCropGuideline extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Visibility(
-          visible: cropGuideLineType != CropGuideLineType.clear,
-          child: IgnorePointer(
-            child: ClipPath(
-              clipper: CropAreaClipper(cropAreaItem, radius: radius),
-              child: Container(
-                width: double.infinity,
-                height: double.infinity,
-                color: backgroundColor,
+  Widget build(BuildContext context) => Stack(
+        children: [
+          Visibility(
+            visible: cropGuideLineType != CropGuideLineType.clear,
+            child: IgnorePointer(
+              child: ClipPath(
+                clipper: CropAreaClipper(cropAreaItem, radius: radius),
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: backgroundColor,
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 }

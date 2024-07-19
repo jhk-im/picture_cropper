@@ -20,22 +20,20 @@ class CropControlPoint extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.transparent,
-      width: controlPointSize,
-      height: controlPointSize,
-      child: pointShape == 0
-          ? Center(
-              child: Container(
-                width: 12,
-                height: 12,
-                color: color,
-              ),
-            )
-          : _rectanglePoint(),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+        color: Colors.transparent,
+        width: controlPointSize,
+        height: controlPointSize,
+        child: pointShape == 0
+            ? Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  color: color,
+                ),
+              )
+            : _rectanglePoint(),
+      );
 
   Widget _rectanglePoint() {
     final radius = 12.0;
