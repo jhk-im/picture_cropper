@@ -13,13 +13,11 @@ import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
 class PictureEditor extends StatefulWidget {
   final PictureCropperController controller;
   final Color imageBackgroundColor;
-  final Function(Uint8List) onEditComplete;
 
   const PictureEditor({
     super.key,
     required this.controller,
     this.imageBackgroundColor = Colors.transparent,
-    required this.onEditComplete,
   });
 
   @override
@@ -57,8 +55,7 @@ class _PictureEditorState extends State<PictureEditor> {
       ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       Uint8List pngBytes = byteData!.buffer.asUint8List();
-      widget.controller.setCapturePng(pngBytes);
-      widget.onEditComplete(pngBytes);
+      widget.controller.setCropImageBytes(pngBytes);
     } catch (e) {
       print(e);
     }

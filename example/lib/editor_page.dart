@@ -10,12 +10,16 @@ class EditorPage extends StatefulWidget {
 }
 
 class _EditorPageState extends State<EditorPage> {
-  final pictureCropperController = PictureCropperController();
+  late PictureCropperController pictureCropperController;
   bool _isVisibleBottomSheet = false;
 
   @override
   void initState() {
-    pictureCropperController.resetEditorData();
+    pictureCropperController = PictureCropperController(
+      onCreateCropImage: (bytes) {
+        Navigator.pushNamed(context, '/crop');
+      },
+    );
     super.initState();
   }
 
@@ -86,12 +90,7 @@ class _EditorPageState extends State<EditorPage> {
                 ),
                 const Spacer(),
               },
-              PictureEditor(
-                controller: pictureCropperController,
-                onEditComplete: (bytes) {
-                  Navigator.pushNamed(context, '/crop');
-                },
-              ),
+              PictureEditor(controller: pictureCropperController),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: InkWell(
@@ -105,7 +104,7 @@ class _EditorPageState extends State<EditorPage> {
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: InkWell(
-                  onTap: pictureCropperController.capturePng,
+                  onTap: pictureCropperController.createCropImage,
                   child: const Icon(
                     Icons.next_plan,
                     color: Colors.black,

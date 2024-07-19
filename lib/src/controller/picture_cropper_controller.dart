@@ -12,119 +12,72 @@ import 'package:picture_cropper/src/model/crop_area_item.dart';
 /// It is mandatory to use it in [PicturePicker], [PictureEditor], and [PictureCrop] widgets.
 class PictureCropperController extends ChangeNotifier {
   /// [onSelectedImage] callback is used only in the [PicturePicker] widget.
+  /// [onCreateCropImage] callback is used only in the [PictureEditor] widget.
   /// If the callback is provided outside of [PicturePicker], the [cameraController] will be unnecessarily initialized.
-  PictureCropperController({this.onSelectedImage}) {
+  PictureCropperController({this.onSelectedImage, this.onCreateCropImage}) {
     if (onSelectedImage != null) {
       _renderBoxWidth = 0;
       initializeControllerFuture = _initializeCamera();
+    } else if (onCreateCropImage != null) {
+      resetEditorData();
     }
   }
 
-  /// [_cropAreaItem] contains guide line and crop coordinate information and is used only within the package.
+  /// [PictureCropperController]------------------------------------------------
+  /// Contains guide line and crop coordinate information and is used only within the package.
   /// It is used in [PicturePicker], [PictureEditor], and [PictureCrop] widgets.
   static CropAreaItem _cropAreaItem = CropAreaItem();
   CropAreaItem get cropAreaItem => _cropAreaItem;
 
-  /// [_imageBytes] contains the original pictures as Unit8List.
+  /// Contains the original pictures as Unit8List.
   static Uint8List _imageBytes = Uint8List(0);
   Uint8List get imageBytes => _imageBytes;
 
-  /// [_captureImageBytes] contains the edited pictures as Unit8List.
-  static Uint8List _captureImageBytes = Uint8List(0);
-  Uint8List get captureImageBytes => _captureImageBytes;
+  /// Contains the edited pictures as Unit8List.
+  static Uint8List _cropImageBytes = Uint8List(0);
+  Uint8List get cropImageBytes => _cropImageBytes;
 
-  /// [_isTakePicture] check take picture or pick from gallery,
+  /// Check take picture or pick from gallery,
   static bool _isTakePicture = false;
   bool get isTakePicture => _isTakePicture;
 
-  /// [isFrontCamera] check camera direction
+  /// Check camera direction
   static bool _isFrontCamera = false;
   bool get isFrontCamera => _isFrontCamera;
 
-  /// [_renderBoxWidth], [_renderBoxHeight] is size of [PicturePicker], [PictureEditor], [PictureCrop] screens renderBox
+  /// Size of [PicturePicker], [PictureEditor], [PictureCrop] screens renderBox
   static double _renderBoxWidth = 0.0;
   double get renderBoxWidth => _renderBoxWidth;
   static double _renderBoxHeight = 0.0;
   double get renderBoxHeight => _renderBoxHeight;
 
-  /// [_guidelineMargin] Guideline margin in [PicturePicker]
+  /// Guideline margin in [PicturePicker]
   static double _guidelineMargin = 0.0;
-  double get guidelineMargin => _guidelineMargin;
 
-  /// [_guidelineRadius] Guideline radius in [PicturePicker]
+  /// Guideline radius in [PicturePicker]
   static double _guidelineRadius = 0.0;
   double get guidelineRadius => _guidelineRadius;
 
-  /// [_guidelineRatio] Card Guideline ratio in [PicturePicker], [PictureEditor]
+  /// Card Guideline ratio in [PicturePicker], [PictureEditor]
   static double _guidelineRatio = 0.0;
-  double get guidelineRatio => _guidelineRatio;
 
-  /// [guideBackgroundColor] Guideline backgroundColor in [PicturePicker], [PictureEditor]
+  /// Guideline backgroundColor in [PicturePicker], [PictureEditor]
   static Color _guideBackgroundColor = Colors.transparent;
   Color get guideBackgroundColor => _guideBackgroundColor;
 
-  /// Do not call this method from outside the package.
-  /// Calling this method from outside the package may cause the package to not work properly.
-  updateCropAreaItem(CropAreaItem cropAreaItem) {
-    _cropAreaItem = cropAreaItem;
-  }
-
-  /// Crop Guideline data set in [PicturePicker], [PictureEditor]
-  void initialCropData(
-      {required double renderBoxWidth,
-      required double renderBoxHeight,
-      required double guidelineMargin,
-      required double guidelineRadius,
-      required double guidelineRatio,
-      Color? guideBackgroundColor}) {
-    if (_renderBoxWidth > 0) return;
-    _renderBoxWidth = renderBoxWidth;
-    _renderBoxHeight = renderBoxHeight;
-    _guidelineMargin = guidelineMargin;
-    _guidelineRadius = guidelineRadius;
-    _guidelineRatio = guidelineRatio;
-    _guideBackgroundColor = guideBackgroundColor ?? Colors.black.withAlpha(180);
-    changeCropGuideLineType(CropGuideLineType.qr, isInitial: true);
-  }
-
+  /// Edit image scale in [PictureEditor]
   static double _editImageScale = 1.0;
   double get editImageScale => _editImageScale;
 
+  /// Edit image rotate in [PictureEditor]
   static double _editImageRotate = 0.0;
   double get editImageRotate => _editImageRotate;
 
+  /// Edit image offset x,y in [PictureEditor]
   static Offset _editImageOffset = Offset.zero;
   Offset get editImageOffset => _editImageOffset;
 
-  /// This method changes the scale of image in [PictureEditor].
-  void changeEditImageScale(double scale) {
-    if (scale <= 3 || scale >= 0.3) {
-      _editImageScale = scale;
-      notifyListeners();
-    }
-  }
-
-  /// This method changes the rotate of image in [PictureEditor].
-  void changeEditImageRotate(double rotate) {
-    if (rotate <= 3.15 || rotate >= -3.15) {
-      _editImageRotate = rotate;
-      notifyListeners();
-    }
-  }
-
-  /// This method changes the offset of image in [PictureEditor].
-  void changeEditImageOffset(Offset offset) {
-    _editImageOffset = offset;
-    notifyListeners();
-  }
-
-  /// This method reset the editor data
-  void resetEditorData() {
-    _editImageScale = 1.0;
-    _editImageRotate = 0.0;
-    _editImageOffset = Offset.zero;
-  }
-
+  /// [PicturePicker]-----------------------------------------------------------
   /// Used in [PicturePicker] for camera shooting.
   CameraController? _cameraController;
   CameraController? get cameraController => _cameraController;
@@ -149,6 +102,24 @@ class PictureCropperController extends ChangeNotifier {
 
     await _cameraController!.initialize();
     notifyListeners(); // camera toggle notification
+  }
+
+  /// Crop Guideline data set in [PicturePicker]
+  void initialCropData(
+      {required double renderBoxWidth,
+      required double renderBoxHeight,
+      required double guidelineMargin,
+      required double guidelineRadius,
+      required double guidelineRatio,
+      Color? guideBackgroundColor}) {
+    if (_renderBoxWidth > 0) return;
+    _renderBoxWidth = renderBoxWidth;
+    _renderBoxHeight = renderBoxHeight;
+    _guidelineMargin = guidelineMargin;
+    _guidelineRadius = guidelineRadius;
+    _guidelineRatio = guidelineRatio;
+    _guideBackgroundColor = guideBackgroundColor ?? Colors.black.withAlpha(180);
+    changeCropGuideLineType(CropGuideLineType.qr, isInitial: true);
   }
 
   /// This method toggles the camera direction in [PicturePicker].
@@ -176,21 +147,6 @@ class PictureCropperController extends ChangeNotifier {
     }
   }
 
-  /// This method is used for capture edit image in [PictureEditor]
-  void setCapturePng(Uint8List pngBytes) {
-    _captureImageBytes = pngBytes;
-  }
-
-  bool _calledCapturePng = false;
-  bool get calledCapturePng => _calledCapturePng;
-
-  /// this method is used for called capture png image in [PictureEditor]
-  void capturePng() {
-    _calledCapturePng = true;
-    notifyListeners();
-    _calledCapturePng = false;
-  }
-
   /// This method is used to pick images from the gallery in [PicturePicker].
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
@@ -203,7 +159,7 @@ class PictureCropperController extends ChangeNotifier {
     }
   }
 
-  /// [CropGuideLineType] includes three types: qr, card, clear.
+  /// [CropGuideLineType] includes four types: qr, v-card, h-card, clear.
   CropGuideLineType _cropGuidelineType = CropGuideLineType.qr;
   CropGuideLineType get cropGuidelineType => _cropGuidelineType;
 
@@ -212,7 +168,7 @@ class PictureCropperController extends ChangeNotifier {
       {bool isInitial = false}) {
     _cropGuidelineType = type;
 
-    double qrWidth = renderBoxWidth - (guidelineMargin * 2);
+    double qrWidth = renderBoxWidth - (_guidelineMargin * 2);
     double shortLine = qrWidth * _guidelineRatio;
     double left = 0;
     double top = 0;
@@ -221,8 +177,8 @@ class PictureCropperController extends ChangeNotifier {
 
     switch (_cropGuidelineType) {
       case CropGuideLineType.qr:
-        left = guidelineMargin;
-        right = renderBoxWidth - guidelineMargin;
+        left = _guidelineMargin;
+        right = renderBoxWidth - _guidelineMargin;
         top = (renderBoxHeight - qrWidth) / 2;
         bottom = top + qrWidth;
       case CropGuideLineType.verticalCard:
@@ -231,15 +187,15 @@ class PictureCropperController extends ChangeNotifier {
         top = (renderBoxHeight - qrWidth) / 2;
         bottom = top + qrWidth;
       case CropGuideLineType.card:
-        left = guidelineMargin;
-        right = renderBoxWidth - guidelineMargin;
+        left = _guidelineMargin;
+        right = renderBoxWidth - _guidelineMargin;
         top = (renderBoxHeight - shortLine) / 2;
         bottom = top + shortLine;
       default:
-        left = guidelineMargin;
-        right = renderBoxWidth - guidelineMargin;
-        top = guidelineMargin;
-        bottom = renderBoxHeight - guidelineMargin;
+        left = _guidelineMargin;
+        right = renderBoxWidth - _guidelineMargin;
+        top = _guidelineMargin;
+        bottom = renderBoxHeight - _guidelineMargin;
     }
 
     _cropAreaItem = CropAreaItem(
@@ -258,6 +214,64 @@ class PictureCropperController extends ChangeNotifier {
     if (!isInitial) notifyListeners();
   }
 
+  /// [PictureEditor]-----------------------------------------------------------
+  /// Used in [PictureEditor] for capture edit image.
+  bool _calledCreateCropImage = false;
+  bool get calledCapturePng => _calledCreateCropImage;
+  final void Function(Uint8List)? onCreateCropImage;
+
+  /// Do not call this method from outside the package.
+  /// Calling this method from outside the package may cause the package to not work properly.
+  /// This method update the crop area item in [PictureEditor]
+  void updateCropAreaItem(CropAreaItem cropAreaItem) {
+    _cropAreaItem = cropAreaItem;
+  }
+
+  /// Do not call this method from outside the package.
+  /// Calling this method from outside the package may cause the package to not work properly.
+  /// This method set the edit image bytes in [PictureEditor]
+  void setCropImageBytes(Uint8List pngBytes) {
+    _cropImageBytes = pngBytes;
+    onCreateCropImage?.call(pngBytes);
+  }
+
+  /// This method changes the scale of image in [PictureEditor].
+  void changeEditImageScale(double scale) {
+    if (scale <= 3 || scale >= 0.3) {
+      _editImageScale = scale;
+      notifyListeners();
+    }
+  }
+
+  /// This method changes the rotate of image in [PictureEditor].
+  void changeEditImageRotate(double rotate) {
+    if (rotate <= 3.15 || rotate >= -3.15) {
+      _editImageRotate = rotate;
+      notifyListeners();
+    }
+  }
+
+  /// This method changes the offset of image in [PictureEditor].
+  void changeEditImageOffset(Offset offset) {
+    _editImageOffset = offset;
+    notifyListeners();
+  }
+
+  /// this method is used for create crop png image in [PictureEditor]
+  void createCropImage() {
+    _calledCreateCropImage = true;
+    notifyListeners();
+    _calledCreateCropImage = false;
+  }
+
+  /// This method reset the editor data
+  void resetEditorData() {
+    _editImageScale = 1.0;
+    _editImageRotate = 0.0;
+    _editImageOffset = Offset.zero;
+    notifyListeners();
+  }
+
   bool _isIrregularCrop = false;
   bool get isIrregularCrop => _isIrregularCrop;
 
@@ -272,6 +286,7 @@ class PictureCropperController extends ChangeNotifier {
     _cameraController?.dispose();
   }
 
+  /// [Utils]-------------------------------------------------------------------
   /// Takes a Uint8List and returns the image extension type.
   String getImageTypeFromBytes(Uint8List data) {
     if (data[0] == 0x89 &&

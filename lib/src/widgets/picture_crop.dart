@@ -80,7 +80,7 @@ class _PictureCropState extends State<PictureCrop> {
   /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
   Future<ui.Image> _loadCropImage() async {
     final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(widget.controller.captureImageBytes,
+    ui.decodeImageFromList(widget.controller.cropImageBytes,
         (ui.Image image) async {
       /// STEP 1
       /// ui.image width, height
