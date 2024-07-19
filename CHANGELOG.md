@@ -1,3 +1,6 @@
+## 0.1.1
+- Publish to pub.dev
+
 ## 0.1.0
 - Change crop internal logic
 
