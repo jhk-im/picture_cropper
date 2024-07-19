@@ -5,7 +5,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:picture_cropper/picture_cropper.dart';
-import 'package:picture_cropper/src/common/enums.dart';
 import 'package:picture_cropper/src/model/crop_area_item.dart';
 
 /// This class includes methods for camera shooting, gallery picking, and editing.
