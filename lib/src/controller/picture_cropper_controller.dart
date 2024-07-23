@@ -15,6 +15,8 @@ class PictureCropperController extends ChangeNotifier {
     if (isPicker) {
       _renderBoxWidth = 0;
       initializeControllerFuture = _initializeCamera();
+    } else {
+      resetEditorData();
     }
   }
 
@@ -220,26 +222,26 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method changes the scale of image in [PictureEditor].
-  // void changeEditImageScale(double scale) {
-  //   if (scale <= 3 || scale >= 0.3) {
-  //     _editImageScale = scale;
-  //     notifyListeners();
-  //   }
-  // }
+  void changeEditImageScale(double scale) {
+    if (scale <= 3 || scale >= 0.3) {
+      _editImageScale = scale;
+      notifyListeners();
+    }
+  }
 
   /// This method changes the rotate of image in [PictureEditor].
-  // void changeEditImageRotate(double rotate) {
-  //   if (rotate <= 3.15 || rotate >= -3.15) {
-  //     _editImageRotate = rotate;
-  //     notifyListeners();
-  //   }
-  // }
+  void changeEditImageRotate(double rotate) {
+    if (rotate <= 3.15 || rotate >= -3.15) {
+      _editImageRotate = rotate;
+      notifyListeners();
+    }
+  }
 
   /// This method changes the offset of image in [PictureEditor].
-  // void changeEditImageOffset(Offset offset) {
-  //   _editImageOffset = offset;
-  //   notifyListeners();
-  // }
+  void changeEditImageOffset(Offset offset) {
+    _editImageOffset = offset;
+    notifyListeners();
+  }
 
   /// this method is used for create crop png image in [PictureEditor]
   bool _calledCreateCropImage = false;

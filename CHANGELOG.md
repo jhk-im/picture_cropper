@@ -1,3 +1,6 @@
+## 0.1.2
+- Add rotate, scale, offset in Editor
+
 ## 0.1.1
 - Publish to pub.dev
 

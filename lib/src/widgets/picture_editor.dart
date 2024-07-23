@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
@@ -29,11 +30,10 @@ class PictureEditor extends StatefulWidget {
 }
 
 class _PictureEditorState extends State<PictureEditor> {
-  bool _isStackBlock = false;
+  final GlobalKey _globalKey = GlobalKey();
 
   @override
   void initState() {
-    widget.controller.resetEditorData();
     widget.controller.addListener(_controllerListener);
     super.initState();
   }
@@ -52,31 +52,41 @@ class _PictureEditorState extends State<PictureEditor> {
     }
   }
 
-  Future _cropImage() async {
-    setState(() {
-      _isStackBlock = true;
-    });
-    final item = widget.controller.cropAreaItem;
-    final cropAreaPath = Path()
-      ..moveTo(item.leftTopX, item.leftTopY)
-      ..lineTo(item.rightTopX, item.rightTopY)
-      ..lineTo(item.rightBottomX, item.rightBottomY)
-      ..lineTo(item.leftBottomX, item.leftBottomY)
-      ..lineTo(item.leftTopX, item.leftTopY)
-      ..close();
-    final image = await _loadCropImage(cropAreaPath);
-    widget.onCropComplete(image);
-    setState(() {
-      _isStackBlock = false;
-    });
+  Future<void> _cropImage() async {
+    // Widget Capture
+    try {
+      RenderRepaintBoundary boundary = _globalKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+      final cropImage = await _loadCropImage(pngBytes);
+      widget.onCropComplete(cropImage);
+    } catch (e) {
+      print(e);
+    }
+
+    // Original Image
+    //final cropImage = await _loadCropImage(widget.controller.originalImageBytes);
+    //widget.onCropComplete(cropImage);
   }
 
   /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
-  Future<ui.Image> _loadCropImage(Path cropAreaPath) async {
+  Future<ui.Image> _loadCropImage(Uint8List imageBytes) async {
     final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(widget.controller.originalImageBytes,
-        (ui.Image image) async {
+    ui.decodeImageFromList(imageBytes, (ui.Image image) async {
       /// STEP 1
+      /// cropAreaPath
+      final item = widget.controller.cropAreaItem;
+      final cropAreaPath = Path()
+        ..moveTo(item.leftTopX, item.leftTopY)
+        ..lineTo(item.rightTopX, item.rightTopY)
+        ..lineTo(item.rightBottomX, item.rightBottomY)
+        ..lineTo(item.leftBottomX, item.leftBottomY)
+        ..lineTo(item.leftTopX, item.leftTopY)
+        ..close();
+
       /// ui.image width, height
       final imageWidth = image.width.toDouble();
       final imageHeight = image.height.toDouble();
@@ -193,11 +203,11 @@ class _PictureEditorState extends State<PictureEditor> {
       x = -1.0;
       y = 1.0;
     }
-    return AbsorbPointer(
-      absorbing: _isStackBlock,
-      child: Stack(
-        children: [
-          ClipRect(
+    return Stack(
+      children: [
+        RepaintBoundary(
+          key: _globalKey,
+          child: ClipRect(
             child: Container(
               color: widget.imageBackgroundColor,
               width: widget.controller.renderBoxWidth,
@@ -219,16 +229,16 @@ class _PictureEditorState extends State<PictureEditor> {
               ),
             ),
           ),
-          Container(
-            color: widget.imageBackgroundColor,
-            width: widget.controller.renderBoxWidth,
-            height: widget.controller.renderBoxHeight,
-            child: widget.controller.isIrregularCrop
-                ? IrregularCrop(controller: widget.controller)
-                : RectangleCrop(controller: widget.controller),
-          ),
-        ],
-      ),
+        ),
+        Container(
+          color: widget.imageBackgroundColor,
+          width: widget.controller.renderBoxWidth,
+          height: widget.controller.renderBoxHeight,
+          child: widget.controller.isIrregularCrop
+              ? IrregularCrop(controller: widget.controller)
+              : RectangleCrop(controller: widget.controller),
+        ),
+      ],
     );
   }
 }

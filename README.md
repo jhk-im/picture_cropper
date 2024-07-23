@@ -195,6 +195,18 @@ InkWell(
     size: 32,
   ),
 ),
+
+/// Method - changeEditImageScale
+pictureCropperController.changeEditImageScale(_scale);
+
+/// Method - changeEditImageRotate
+pictureCropperController.changeEditImageRotate(_rotate);
+
+/// Method - changeEditImageOffset
+pictureCropperController.changeEditImageOffset(_offset);
+
+/// Method - resetEditorData
+pictureCropperController.resetEditorData();
 ```
 
 ```txt
