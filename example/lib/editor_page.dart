@@ -13,6 +13,13 @@ class _EditorPageState extends State<EditorPage> {
   final pictureCropperController = PictureCropperController();
   bool _isVisibleBottomSheet = false;
 
+  double _blur = 0.0;
+
+  double _grayscale = 0.0;
+  double _brightness = 0.0;
+  double _saturation = 1.0;
+  bool _invert = false;
+
   double _scaleValue = 1.0;
   double _rotateValue = 0.0;
   Offset _offset = Offset.zero;
@@ -120,81 +127,183 @@ class _EditorPageState extends State<EditorPage> {
 
   Widget _editController() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
+      height: 288,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Row(
-            children: [
-              const SizedBox(width: 80, child: Text('Scale')),
-              Expanded(
-                child: CustomSlider(
-                  value: _scaleValue,
-                  min: 0.3,
-                  max: 1.7,
-                  onChanged: (value) {
-                    setState(() {
-                      _scaleValue = value;
-                    });
-                    pictureCropperController.changeEditImageScale(value);
-                  },
+          Expanded(
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // Blur
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Blur')),
+                        Expanded(
+                          child: Slider(
+                            value: _blur,
+                            min: 0,
+                            max: 50,
+                            onChanged: (value) {
+                              setState(() {
+                                _blur = value;
+                              });
+                              pictureCropperController
+                                  .changeEditImageBlur(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Grayscale')),
+                        Expanded(
+                          child: Slider(
+                            value: _grayscale,
+                            min: 0.0,
+                            max: 1.0,
+                            onChanged: (value) {
+                              setState(() {
+                                _grayscale = value;
+                              });
+                              pictureCropperController.changeEditImageFilter(
+                                  _grayscale,
+                                  _brightness,
+                                  _saturation,
+                                  _invert);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Saturation')),
+                        Expanded(
+                          child: Slider(
+                            value: _saturation,
+                            min: 1.0,
+                            max: 10.0,
+                            onChanged: (value) {
+                              setState(() {
+                                _saturation = value;
+                              });
+                              pictureCropperController.changeEditImageFilter(
+                                  _grayscale,
+                                  _brightness,
+                                  _saturation,
+                                  _invert);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Brightness')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _brightness,
+                            min: -1.0,
+                            max: 1.0,
+                            onChanged: (value) {
+                              setState(() {
+                                _brightness = value;
+                              });
+                              pictureCropperController.changeEditImageFilter(
+                                  _grayscale,
+                                  _brightness,
+                                  _saturation,
+                                  _invert);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Scale')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _scaleValue,
+                            min: 0.3,
+                            max: 1.7,
+                            onChanged: (value) {
+                              setState(() {
+                                _scaleValue = value;
+                              });
+                              pictureCropperController
+                                  .changeEditImageScale(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Rotate')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _rotateValue,
+                            min: -3.15,
+                            max: 3.15,
+                            onChanged: (value) {
+                              setState(() {
+                                _rotateValue = value;
+                              });
+                              pictureCropperController
+                                  .changeEditImageRotate(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('OffsetX')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _offset.dx,
+                            min: -pictureCropperController.renderBoxWidth,
+                            max: pictureCropperController.renderBoxWidth,
+                            onChanged: (value) {
+                              setState(() {
+                                _offset = Offset(value, _offset.dy);
+                              });
+                              pictureCropperController
+                                  .changeEditImageOffset(_offset);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('OffsetY')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _offset.dy,
+                            min: -pictureCropperController.renderBoxHeight,
+                            max: pictureCropperController.renderBoxHeight,
+                            onChanged: (value) {
+                              setState(() {
+                                _offset = Offset(_offset.dx, value);
+                              });
+                              pictureCropperController
+                                  .changeEditImageOffset(_offset);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 80, child: Text('Rotate')),
-              Expanded(
-                child: CustomSlider(
-                  value: _rotateValue,
-                  min: -3.15,
-                  max: 3.15,
-                  onChanged: (value) {
-                    setState(() {
-                      _rotateValue = value;
-                    });
-                    pictureCropperController.changeEditImageRotate(value);
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 80, child: Text('OffsetX')),
-              Expanded(
-                child: CustomSlider(
-                  value: _offset.dx,
-                  min: -pictureCropperController.renderBoxWidth,
-                  max: pictureCropperController.renderBoxWidth,
-                  onChanged: (value) {
-                    setState(() {
-                      _offset = Offset(value, _offset.dy);
-                    });
-                    pictureCropperController.changeEditImageOffset(_offset);
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const SizedBox(width: 80, child: Text('OffsetY')),
-              Expanded(
-                child: CustomSlider(
-                  value: _offset.dy,
-                  min: -pictureCropperController.renderBoxHeight,
-                  max: pictureCropperController.renderBoxHeight,
-                  onChanged: (value) {
-                    setState(() {
-                      _offset = Offset(_offset.dx, value);
-                    });
-                    pictureCropperController.changeEditImageOffset(_offset);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
           Row(
             children: [
@@ -205,6 +314,13 @@ class _EditorPageState extends State<EditorPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
+                        _blur = 0.0;
+
+                        _brightness = 0.0;
+                        _grayscale = 0.0;
+                        _saturation = 1.0;
+                        _invert = false;
+
                         _rotateValue = 0.0;
                         _scaleValue = 1.0;
                         _offset = Offset.zero;
@@ -218,7 +334,35 @@ class _EditorPageState extends State<EditorPage> {
                       ),
                     ),
                     child: const Text(
-                      'Image Reset',
+                      'Reset',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Container(
+                  height: 40,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _invert = !_invert;
+                      });
+                      pictureCropperController.changeEditImageFilter(
+                          _grayscale, _brightness, _saturation, _invert);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _invert
+                          ? Theme.of(context).primaryColor
+                          : Theme.of(context).hintColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Invert',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),

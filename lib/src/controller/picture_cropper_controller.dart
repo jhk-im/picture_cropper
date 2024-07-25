@@ -58,18 +58,6 @@ class PictureCropperController extends ChangeNotifier {
   static Color _guideBackgroundColor = Colors.transparent;
   Color get guideBackgroundColor => _guideBackgroundColor;
 
-  /// Edit image scale in [PictureEditor]
-  static double _editImageScale = 1.0;
-  double get editImageScale => _editImageScale;
-
-  /// Edit image rotate in [PictureEditor]
-  static double _editImageRotate = 0.0;
-  double get editImageRotate => _editImageRotate;
-
-  /// Edit image offset x,y in [PictureEditor]
-  static Offset _editImageOffset = Offset.zero;
-  Offset get editImageOffset => _editImageOffset;
-
   /// [PicturePicker]-----------------------------------------------------------
   /// Used in [PicturePicker] for camera shooting.
   CameraController? _cameraController;
@@ -214,6 +202,48 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// [PictureEditor]-----------------------------------------------------------
+
+  /// Edit image scale in [PictureEditor]
+  double _editImageScale = 1.0;
+  double get editImageScale => _editImageScale;
+
+  /// Edit image rotate in [PictureEditor]
+  double _editImageRotate = 0.0;
+  double get editImageRotate => _editImageRotate;
+
+  /// Edit image blur in [PictureEditor]
+  double _editImageBlur = 0.0;
+  double get editImageBlur => _editImageBlur;
+
+  /// Edit image color matrix in [PictureEditor]
+  ColorFilter _editImageColorFilter = ColorFilter.matrix([
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+  ]);
+  ColorFilter get editImageColorFilter => _editImageColorFilter;
+
+  /// Edit image offset x,y in [PictureEditor]
+  Offset _editImageOffset = Offset.zero;
+  Offset get editImageOffset => _editImageOffset;
+
   /// Do not call this method from outside the package.
   /// Calling this method from outside the package may cause the package to not work properly.
   /// This method update the crop area item in [PictureEditor]
@@ -243,6 +273,77 @@ class PictureCropperController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// This method changes the blur of image in [PictureEditor].
+  void changeEditImageBlur(double blur) {
+    if (blur < 0 || blur > 50) return;
+    _editImageBlur = blur;
+    notifyListeners();
+  }
+
+  void changeEditImageFilter(
+      double grayscale, double brightness, double saturation, bool invert) {
+    if (grayscale < 0 || grayscale > 1) return;
+    if (brightness < -1 || brightness > 1) return;
+    if (saturation < 1 || saturation > 10) return;
+
+    final invGrayscale = 1 - grayscale;
+    final invSaturation = 1 - saturation;
+    final r = 0.2126 * invSaturation;
+    final g = 0.7152 * invSaturation;
+    final b = 0.0722 * invSaturation;
+
+    List<double> colorMatrix = [
+      invGrayscale * (r + saturation) + grayscale * 0.2126,
+      invGrayscale * g + grayscale * 0.7152,
+      invGrayscale * b + grayscale * 0.0722,
+      0,
+      brightness * 255,
+      invGrayscale * r + grayscale * 0.2126,
+      invGrayscale * (g + saturation) + grayscale * 0.7152,
+      invGrayscale * b + grayscale * 0.0722,
+      0,
+      brightness * 255,
+      invGrayscale * r + grayscale * 0.2126,
+      invGrayscale * g + grayscale * 0.7152,
+      invGrayscale * (b + saturation) + grayscale * 0.0722,
+      0,
+      brightness * 255,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ];
+
+    if (invert) {
+      colorMatrix = [
+        -colorMatrix[0],
+        -colorMatrix[1],
+        -colorMatrix[2],
+        0,
+        255 - colorMatrix[4],
+        -colorMatrix[5],
+        -colorMatrix[6],
+        -colorMatrix[7],
+        0,
+        255 - colorMatrix[9],
+        -colorMatrix[10],
+        -colorMatrix[11],
+        -colorMatrix[12],
+        0,
+        255 - colorMatrix[14],
+        colorMatrix[15],
+        colorMatrix[16],
+        colorMatrix[17],
+        1,
+        colorMatrix[19],
+      ];
+    }
+
+    _editImageColorFilter = ColorFilter.matrix(colorMatrix);
+    notifyListeners();
+  }
+
   /// this method is used for create crop png image in [PictureEditor]
   bool _calledCreateCropImage = false;
   bool get calledCreateCropImage => _calledCreateCropImage;
@@ -257,6 +358,29 @@ class PictureCropperController extends ChangeNotifier {
     _editImageScale = 1.0;
     _editImageRotate = 0.0;
     _editImageOffset = Offset.zero;
+    _editImageBlur = 0.0;
+    _editImageColorFilter = ColorFilter.matrix([
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ]);
     notifyListeners();
   }
 

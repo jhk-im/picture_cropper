@@ -5,9 +5,10 @@
 
 A Flutter package for cropping pictures, which includes features for capturing images from the camera or selecting images from the gallery.
 
+Crop & Editor
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme.gif?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_01.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_01.gif?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_02.gif?raw=true" width="200" height="400"/>
 </p>
 
 Irregular Crop
@@ -204,6 +205,15 @@ pictureCropperController.changeEditImageRotate(_rotate);
 
 /// Method - changeEditImageOffset
 pictureCropperController.changeEditImageOffset(_offset);
+
+/// Method - changeEditImageFilter
+/// grayscale, brightness, saturation, invert
+pictureCropperController.changeEditImageFilter(
+  _grayscale,
+  _brightness,
+  _saturation,
+  _invert,
+);
 
 /// Method - resetEditorData
 pictureCropperController.resetEditorData();

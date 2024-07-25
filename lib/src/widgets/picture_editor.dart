@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
 import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';
@@ -220,11 +221,45 @@ class _PictureEditorState extends State<PictureEditor> {
                   ..scale(widget.controller.editImageScale)
                   ..rotateZ(widget.controller.editImageRotate),
                 alignment: Alignment.center,
-                child: Image.memory(
-                  widget.controller.originalImageBytes,
-                  width: widget.controller.renderBoxWidth,
-                  height: widget.controller.renderBoxHeight,
-                  fit: BoxFit.contain,
+                child: Stack(
+                  children: [
+                    ColorFiltered(
+                      colorFilter: widget.controller.editImageColorFilter,
+                      child: Image.memory(
+                        widget.controller.originalImageBytes,
+                        width: widget.controller.renderBoxWidth,
+                        height: widget.controller.renderBoxHeight,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    BackdropFilter(
+                      blendMode: widget.controller.editImageBlur > 0
+                          ? BlendMode.srcIn
+                          : BlendMode.srcOver,
+                      filter: ui.ImageFilter.blur(
+                        sigmaX: widget.controller.editImageBlur,
+                        sigmaY: widget.controller.editImageBlur,
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+
+                    // BlendMode.screen = 밝기
+                    // BlendMode.difference = 대조
+                    // BlendMode.colorBurn = 어두워짐
+                    // BlendMode.lighten = 흐려짐? 그레이?
+                    // BackdropFilter(
+                    //   blendMode: BlendMode.lighten,
+                    //   filter: ui.ImageFilter.blur(
+                    //     sigmaX: widget.controller.editImageBlur,
+                    //     sigmaY: widget.controller.editImageBlur,
+                    //   ),
+                    //   child: Container(
+                    //     color: Colors.transparent,
+                    //   ),
+                    // ),
+                  ],
                 ),
               ),
             ),
