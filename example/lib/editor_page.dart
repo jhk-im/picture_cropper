@@ -14,6 +14,8 @@ class _EditorPageState extends State<EditorPage> {
   bool _isVisibleBottomSheet = false;
 
   double _blur = 0.0;
+  double _temperature = 0.0;
+  double _lighten = 0.0;
 
   double _grayscale = 0.0;
   double _brightness = 0.0;
@@ -138,7 +140,6 @@ class _EditorPageState extends State<EditorPage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    // Blur
                     Row(
                       children: [
                         const SizedBox(width: 90, child: Text('Blur')),
@@ -146,7 +147,7 @@ class _EditorPageState extends State<EditorPage> {
                           child: Slider(
                             value: _blur,
                             min: 0,
-                            max: 50,
+                            max: 25,
                             onChanged: (value) {
                               setState(() {
                                 _blur = value;
@@ -197,6 +198,44 @@ class _EditorPageState extends State<EditorPage> {
                                   _brightness,
                                   _saturation,
                                   _invert);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Lighten')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _lighten,
+                            min: -20,
+                            max: 20,
+                            onChanged: (value) {
+                              setState(() {
+                                _lighten = value;
+                              });
+                              pictureCropperController
+                                  .changeEditImageLighten(value);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(width: 90, child: Text('Temperature')),
+                        Expanded(
+                          child: CustomSlider(
+                            value: _temperature,
+                            min: -0.5,
+                            max: 0.5,
+                            onChanged: (value) {
+                              setState(() {
+                                _temperature = value;
+                              });
+                              pictureCropperController
+                                  .changeEditImageTemperature(value);
                             },
                           ),
                         ),
@@ -315,6 +354,8 @@ class _EditorPageState extends State<EditorPage> {
                     onPressed: () {
                       setState(() {
                         _blur = 0.0;
+                        _temperature = 0.0;
+                        _lighten = 0.0;
 
                         _brightness = 0.0;
                         _grayscale = 0.0;

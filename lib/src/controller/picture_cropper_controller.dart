@@ -215,6 +215,14 @@ class PictureCropperController extends ChangeNotifier {
   double _editImageBlur = 0.0;
   double get editImageBlur => _editImageBlur;
 
+  /// Edit image temperature in [PictureEditor]
+  double _editImageTemperature = 0.0;
+  double get editImageTemperature => _editImageTemperature;
+
+  /// Edit image lighten in [PictureEditor]
+  double _editImageLighten = 0.0;
+  double get editImageLighten => _editImageLighten;
+
   /// Edit image color matrix in [PictureEditor]
   ColorFilter _editImageColorFilter = ColorFilter.matrix([
     1,
@@ -275,8 +283,22 @@ class PictureCropperController extends ChangeNotifier {
 
   /// This method changes the blur of image in [PictureEditor].
   void changeEditImageBlur(double blur) {
-    if (blur < 0 || blur > 50) return;
+    if (blur < 0 || blur > 25) return;
     _editImageBlur = blur;
+    notifyListeners();
+  }
+
+  /// This method changes the temperature of image in [PictureEditor].
+  void changeEditImageTemperature(double temperature) {
+    if (temperature < -0.5 || temperature > 0.5) return;
+    _editImageTemperature = temperature;
+    notifyListeners();
+  }
+
+  /// This method changes the lighten of image in [PictureEditor].
+  void changeEditImageLighten(double lighten) {
+    if (lighten < -20 || lighten > 20) return;
+    _editImageLighten = lighten;
     notifyListeners();
   }
 
@@ -359,6 +381,8 @@ class PictureCropperController extends ChangeNotifier {
     _editImageRotate = 0.0;
     _editImageOffset = Offset.zero;
     _editImageBlur = 0.0;
+    _editImageTemperature = 0.0;
+    _editImageLighten = 0.0;
     _editImageColorFilter = ColorFilter.matrix([
       1,
       0,

@@ -1,6 +1,6 @@
 ## 0.1.3
 - Add image filter and blur in Editor
-- 
+
 ## 0.1.2
 - Add rotate, scale, offset in Editor
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -195,6 +196,45 @@ class _PictureEditorState extends State<PictureEditor> {
     return completer.future;
   }
 
+  ColorFilter warmFilter(double value) {
+    return ColorFilter.matrix([
+      1 + value,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1 - value,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+    ]);
+  }
+
+  ColorFilter temperatureFilter(double value) {
+    if (value > 0) {
+      return ColorFilter.mode(
+        Colors.yellow.withOpacity(value),
+        BlendMode.overlay,
+      );
+    } else {
+      return ColorFilter.mode(
+        Colors.blue.withOpacity(-value),
+        BlendMode.overlay,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Front Camera Horizontal Flip
@@ -244,6 +284,34 @@ class _PictureEditorState extends State<PictureEditor> {
                         color: Colors.transparent,
                       ),
                     ),
+                    BackdropFilter(
+                      filter: temperatureFilter(
+                          widget.controller.editImageTemperature),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    BackdropFilter(
+                      blendMode: widget.controller.editImageLighten > 0
+                          ? BlendMode.lighten
+                          : BlendMode.darken,
+                      filter: ui.ImageFilter.blur(
+                        sigmaX: widget.controller.editImageLighten > 0
+                            ? widget.controller.editImageLighten
+                            : -widget.controller.editImageLighten,
+                        sigmaY: widget.controller.editImageLighten > 0
+                            ? widget.controller.editImageLighten
+                            : -widget.controller.editImageLighten,
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+
+                    // BlendMode.darken - 어두움 강조
+                    // BlendMode.overlay - 밝음
+                    // BlendMode.lighten - 밝음 강조
+                    // BlendMode.colorBurn - 번짐
 
                     // BlendMode.screen = 밝기
                     // BlendMode.difference = 대조
