@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:picture_cropper/src/controller/picture_cropper_controller.dart';
 import 'package:picture_cropper/src/widgets/crop/irregular_crop.dart';
 import 'package:picture_cropper/src/widgets/crop/rectangle_crop.dart';

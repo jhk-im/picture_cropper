@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:image/image.dart' as img;
+import 'package:exif/exif.dart';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -501,5 +503,42 @@ class PictureCropperController extends ChangeNotifier {
     }
 
     return 'unknown';
+  }
+
+  /// Takes a Uint8List and returns the image dpi.
+  Future<int> getImageDpi(Uint8List data) async {
+    Map<String, IfdTag> exifData = await readExifFromBytes(data);
+    int dpi = 0;
+    if (exifData.containsKey('XResolution') &&
+        exifData.containsKey('YResolution')) {
+      var xResolution = exifData['XResolution'];
+      var yResolution = exifData['YResolution'];
+      if (xResolution != null && yResolution != null) {
+        dpi = xResolution.printable.contains('/')
+            ? (int.parse(xResolution.printable.split('/')[0]) /
+                    int.parse(xResolution.printable.split('/')[1]))
+                .round()
+            : int.parse(xResolution.printable);
+      }
+    }
+
+    return dpi;
+  }
+
+  /// Takes a Uint8List and returns the image pixel.
+  Size getImagePixel(Uint8List data) {
+    img.Image? image = img.decodeImage(data);
+    if (image == null) return Size(0, 0);
+    return Size(image.width.toDouble(), image.height.toDouble());
+  }
+
+  /// Returns image editor data
+  String getImageEditInfo() {
+    return 'Scale: ${editImageScale.toStringAsFixed(1)}\n'
+        'Rotate: ${editImageRotate.toStringAsFixed(1)}\n'
+        'Offset: x=${editImageOffset.dx.toStringAsFixed(1)}, y=${editImageOffset.dy.toStringAsFixed(1)}\n'
+        'Blur: ${editImageBlur.toStringAsFixed(1)}\n'
+        'Temperature: ${editImageTemperature.toStringAsFixed(1)}\n'
+        'Lighten: ${editImageLighten.toStringAsFixed(1)}\n';
   }
 }

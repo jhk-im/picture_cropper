@@ -1,3 +1,6 @@
+## 0.1.4
+- Add image utils method
+
 ## 0.1.3
 - Add image filter and blur in Editor
 
