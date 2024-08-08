@@ -1,12 +1,13 @@
 name: picture_cropper
 description: Flutter package for capturing and cropping photos from camera or gallery.
-version: 0.1.4
+version: 0.1.5
 repository: https://github.com/jhk-im/picture_cropper
 maintainers:
   - jayhk.dev@gmail.com
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=1.10.0"
 
 dependencies:
   flutter:
@@ -16,6 +17,7 @@ dependencies:
   image_picker: ^1.1.2
   flutter_blurhash: ^0.8.2
   exif: ^3.3.0
+  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
   flutter_test:
@@ -24,3 +26,10 @@ dev_dependencies:
   test: ^1.24.0
   mockito: ^5.4.4
   build_runner: ^2.4.11
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.jhk.android_shoot_sound
+        pluginClass: AndroidShootSound

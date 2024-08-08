@@ -1,3 +1,6 @@
+## 0.1.5
+- Add android camera shoot sound
+
 ## 0.1.4
 - Add image utils method
 

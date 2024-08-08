@@ -127,6 +127,8 @@ class PictureCropperController extends ChangeNotifier {
       return;
     }
 
+    if (Platform.isAndroid) AndroidShootSound.play();
+
     try {
       final image = await _cameraController!.takePicture();
       final bytes = await File(image.path).readAsBytes();
