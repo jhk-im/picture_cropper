@@ -111,8 +111,9 @@ InkWell(
 ),
 
 /// Method - takePicture
+/// default isAndroidShootSound = true(optional)
 InkWell(
-  onTap: pictureEditorController.takePicture
+  onTap: pictureEditorController.takePicture(isAndroidShootSound: true)
   child: const Icon(
     Icons.photo,
     color: Colors.white,

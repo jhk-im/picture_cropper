@@ -122,12 +122,12 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method is used for taking pictures in [PicturePicker].
-  Future<void> takePicture() async {
+  Future<void> takePicture({bool isAndroidSound = true}) async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return;
     }
 
-    if (Platform.isAndroid) AndroidShootSound.play();
+    if (Platform.isAndroid && isAndroidSound) AndroidShootSound.play();
 
     try {
       final image = await _cameraController!.takePicture();
