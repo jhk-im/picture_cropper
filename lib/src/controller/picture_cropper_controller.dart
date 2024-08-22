@@ -141,9 +141,13 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method is used to pick images from the gallery in [PicturePicker].
+  /// Contains the original pictures as XFile.
+  XFile? _originalImageFile;
+  XFile? get originalImageFile => _originalImageFile;
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    _originalImageFile = pickedFile;
     if (pickedFile != null) {
       final bytes = await File(pickedFile.path).readAsBytes();
       _originalImageBytes = bytes;

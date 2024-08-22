@@ -1,3 +1,6 @@
+## 0.1.6
+- Add originalImageFile
+- 
 ## 0.1.5
 - Add android camera shoot sound
 
