@@ -1,3 +1,7 @@
+## 0.1.7
+- Delete originalImageFile
+- Add method for delete image in cache
+
 ## 0.1.6
 - Add originalImageFile
 - 

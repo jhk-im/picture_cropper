@@ -141,18 +141,36 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method is used to pick images from the gallery in [PicturePicker].
-  /// Contains the original pictures as XFile.
-  XFile? _originalImageFile;
-  XFile? get originalImageFile => _originalImageFile;
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    _originalImageFile = pickedFile;
     if (pickedFile != null) {
       final bytes = await File(pickedFile.path).readAsBytes();
       _originalImageBytes = bytes;
       _isTakePicture = false;
       _setOriginalImage();
+      await _deleteImageAndDirectory(pickedFile);
+    }
+  }
+
+  /// This method delete image in cache
+  Future<void> _deleteImageAndDirectory(XFile pickedFile) async {
+    try {
+      final file = File(pickedFile.path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+
+      final directory = file.parent;
+
+      if (await directory.exists()) {
+        final contents = directory.listSync();
+        if (contents.isEmpty) {
+          await directory.delete();
+        }
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
