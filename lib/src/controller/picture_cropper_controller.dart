@@ -6,6 +6,7 @@ import 'package:exif/exif.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:picture_cropper/picture_cropper.dart';
 import 'package:picture_cropper/src/model/crop_area_item.dart';
 
@@ -80,6 +81,7 @@ class PictureCropperController extends ChangeNotifier {
     _cameraController = CameraController(
       cameraDescription,
       ResolutionPreset.max,
+      enableAudio: false,
     );
 
     await _cameraController!.initialize();
@@ -131,7 +133,13 @@ class PictureCropperController extends ChangeNotifier {
 
     try {
       final image = await _cameraController!.takePicture();
-      final bytes = await File(image.path).readAsBytes();
+      final String newFileName = 'picture_cropper_capture.jpg';
+      final Directory directory = await getTemporaryDirectory();
+      final String newPath = '${directory.path}/$newFileName';
+      final File capturedImage = File(image.path);
+      await capturedImage.rename(newPath);
+      final File newImage = File(newPath);
+      final bytes = await newImage.readAsBytes();
       _originalImageBytes = bytes;
       _isTakePicture = true;
       _setOriginalImage();

@@ -1,3 +1,6 @@
+## 0.1.8
+- Add method for delete image in cache when takePicture
+
 ## 0.1.7
 - Delete originalImageFile
 - Add method for delete image in cache
