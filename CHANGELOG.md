@@ -1,3 +1,6 @@
+## 0.1.9
+- Initialize the original image when selecting the gallery image
+
 ## 0.1.8
 - Add method for delete image in cache when takePicture
 

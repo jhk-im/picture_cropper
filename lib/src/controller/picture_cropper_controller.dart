@@ -150,6 +150,7 @@ class PictureCropperController extends ChangeNotifier {
 
   /// This method is used to pick images from the gallery in [PicturePicker].
   Future<void> pickImageFromGallery() async {
+    _originalImageBytes = Uint8List(0);
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
