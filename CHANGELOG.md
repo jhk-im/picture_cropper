@@ -1,3 +1,6 @@
+## 0.1.10
+- Add setManualCropAreaItem method in picture_cropper_controller
+
 ## 0.1.9
 - Initialize the original image when selecting the gallery image
 

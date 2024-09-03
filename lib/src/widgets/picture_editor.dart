@@ -53,7 +53,6 @@ class _PictureEditorState extends State<PictureEditor> {
   }
 
   Future<void> _cropImage() async {
-    // Widget Capture
     try {
       RenderRepaintBoundary boundary = _globalKey.currentContext!
           .findRenderObject() as RenderRepaintBoundary;
@@ -66,10 +65,6 @@ class _PictureEditorState extends State<PictureEditor> {
     } catch (e) {
       print(e);
     }
-
-    // Original Image
-    //final cropImage = await _loadCropImage(widget.controller.originalImageBytes);
-    //widget.onCropComplete(cropImage);
   }
 
   /// This method converts [Uint8List] bytes to a [ui.Image] and image crop.
@@ -305,26 +300,6 @@ class _PictureEditorState extends State<PictureEditor> {
                         color: Colors.transparent,
                       ),
                     ),
-
-                    // BlendMode.darken - 어두움 강조
-                    // BlendMode.overlay - 밝음
-                    // BlendMode.lighten - 밝음 강조
-                    // BlendMode.colorBurn - 번짐
-
-                    // BlendMode.screen = 밝기
-                    // BlendMode.difference = 대조
-                    // BlendMode.colorBurn = 어두워짐
-                    // BlendMode.lighten = 흐려짐? 그레이?
-                    // BackdropFilter(
-                    //   blendMode: BlendMode.lighten,
-                    //   filter: ui.ImageFilter.blur(
-                    //     sigmaX: widget.controller.editImageBlur,
-                    //     sigmaY: widget.controller.editImageBlur,
-                    //   ),
-                    //   child: Container(
-                    //     color: Colors.transparent,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),

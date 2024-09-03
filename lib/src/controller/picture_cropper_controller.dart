@@ -117,14 +117,14 @@ class PictureCropperController extends ChangeNotifier {
   /// this method is used for create crop png image in [PictureEditor]
   bool _calledSetOriginalImage = false;
   bool get calledSetOriginalImage => _calledSetOriginalImage;
-  void _setOriginalImage() {
+  void setOriginalImage() {
     _calledSetOriginalImage = true;
     notifyListeners();
     _calledSetOriginalImage = false;
   }
 
   /// This method is used for taking pictures in [PicturePicker].
-  Future<void> takePicture({bool isAndroidSound = true}) async {
+  Future<void> takePicture({bool isAndroidSound = true, bool isNotifyListeners = true}) async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return;
     }
@@ -133,16 +133,15 @@ class PictureCropperController extends ChangeNotifier {
 
     try {
       final image = await _cameraController!.takePicture();
-      final String newFileName = 'picture_cropper_capture.jpg';
       final Directory directory = await getTemporaryDirectory();
-      final String newPath = '${directory.path}/$newFileName';
+      final String newPath = '${directory.path}/picture_cropper_capture.jpg';
       final File capturedImage = File(image.path);
       await capturedImage.rename(newPath);
       final File newImage = File(newPath);
       final bytes = await newImage.readAsBytes();
       _originalImageBytes = bytes;
       _isTakePicture = true;
-      _setOriginalImage();
+      if (isNotifyListeners) setOriginalImage();
     } catch (e) {
       print(e);
     }
@@ -155,9 +154,18 @@ class PictureCropperController extends ChangeNotifier {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       final bytes = await File(pickedFile.path).readAsBytes();
-      _originalImageBytes = bytes;
+      img.Image? image;
+      if (pickedFile.path.endsWith('.gif')) {
+        image = img.decodeGif(Uint8List.fromList(bytes), frame: 0);
+        if (image != null) {
+          final imageBytes = img.encodeJpg(image);
+          _originalImageBytes = imageBytes;
+        }
+      } else {
+        _originalImageBytes = bytes;
+      }
       _isTakePicture = false;
-      _setOriginalImage();
+      setOriginalImage();
       await _deleteImageAndDirectory(pickedFile);
     }
   }
@@ -455,6 +463,34 @@ class PictureCropperController extends ChangeNotifier {
   /// This method disposes of the [_cameraController] used in [PicturePicker].
   void pictureEditorControllerDispose() {
     _cameraController?.dispose();
+  }
+
+  /// This method is used for set CropAreaItem in [PictureEditor].
+  Future<void> setManualCropAreaItem(double imageWidth, double imageHeight,
+      double left, double right, double top, double bottom) async {
+    final scaleX = renderBoxWidth / imageWidth;
+    final scaleY = renderBoxHeight / imageHeight;
+
+    final leftTopX = left * scaleX;
+    final leftTopY = top * scaleY;
+    final rightTopX = right * scaleX;
+    final rightTopY = top * scaleY;
+    final rightBottomX = right * scaleX;
+    final rightBottomY = bottom * scaleY;
+    final leftBottomX = left * scaleX;
+    final leftBottomY = bottom * scaleY;
+
+    _cropAreaItem = CropAreaItem(
+      leftTopX: leftTopX,
+      leftTopY: leftTopY,
+      rightTopX: rightTopX,
+      rightTopY: rightTopY,
+      rightBottomX: rightBottomX,
+      rightBottomY: rightBottomY,
+      leftBottomX: leftBottomX,
+      leftBottomY: leftBottomY,
+    );
+    notifyListeners();
   }
 
   /// [Utils]-------------------------------------------------------------------
