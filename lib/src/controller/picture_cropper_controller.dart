@@ -14,9 +14,12 @@ import 'package:picture_cropper/src/model/crop_area_item.dart';
 /// It is mandatory to use it in [PicturePicker], [PictureEditor] widgets.
 class PictureCropperController extends ChangeNotifier {
   /// If the callback is provided outside of [PicturePicker], the [cameraController] will be unnecessarily initialized.
-  PictureCropperController({bool isPicker = false}) {
+  PictureCropperController(
+      {bool isPicker = false,
+      CropGuideLineType initCropGuideLine = CropGuideLineType.qr}) {
     if (isPicker) {
       _renderBoxWidth = 0;
+      _initCropGuideLine = initCropGuideLine;
       initializeControllerFuture = _initializeCamera();
     } else {
       resetEditorData();
@@ -88,6 +91,8 @@ class PictureCropperController extends ChangeNotifier {
     notifyListeners(); // camera toggle notification
   }
 
+  CropGuideLineType _initCropGuideLine = CropGuideLineType.qr;
+
   /// Crop Guideline data set in [PicturePicker]
   void initialCropData(
       {required double renderBoxWidth,
@@ -103,7 +108,7 @@ class PictureCropperController extends ChangeNotifier {
     _guidelineRadius = guidelineRadius;
     _guidelineRatio = guidelineRatio;
     _guideBackgroundColor = guideBackgroundColor ?? Colors.black.withAlpha(180);
-    changeCropGuidelineType(CropGuideLineType.qr, isInitial: true);
+    changeCropGuidelineType(_initCropGuideLine, isInitial: true);
   }
 
   /// This method toggles the camera direction in [PicturePicker].
@@ -124,7 +129,8 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method is used for taking pictures in [PicturePicker].
-  Future<void> takePicture({bool isAndroidSound = true, bool isNotifyListeners = true}) async {
+  Future<void> takePicture(
+      {bool isAndroidSound = true, bool isNotifyListeners = true}) async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return;
     }

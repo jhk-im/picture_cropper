@@ -1,3 +1,6 @@
+## 0.1.11
+- Add initial CropGuidelineType in picture_cropper_controller constructor
+
 ## 0.1.10
 - Add setManualCropAreaItem method in picture_cropper_controller
 
