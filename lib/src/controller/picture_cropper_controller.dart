@@ -250,6 +250,10 @@ class PictureCropperController extends ChangeNotifier {
     if (!isInitial) notifyListeners();
   }
 
+  Future<void> setCameraZoom(double level) async {
+    await cameraController?.setZoomLevel(level);
+  }
+
   /// [PictureEditor]-----------------------------------------------------------
 
   /// Edit image scale in [PictureEditor]

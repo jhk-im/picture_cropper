@@ -1,3 +1,6 @@
+## 0.1.12
+- Add camera pinch zoom
+
 ## 0.1.11
 - Add initial CropGuidelineType in picture_cropper_controller constructor
 

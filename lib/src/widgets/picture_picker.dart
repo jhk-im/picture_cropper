@@ -33,6 +33,9 @@ class PicturePicker extends StatefulWidget {
 }
 
 class _PicturePickerState extends State<PicturePicker> {
+  double _scale = 1.0;
+  double _previousScale = 1.0;
+
   @override
   void initState() {
     widget.controller.addListener(_controllerListener);
@@ -77,20 +80,40 @@ class _PicturePickerState extends State<PicturePicker> {
                 guidelineRatio: widget.guideLineRatio,
               );
 
-              return Stack(
-                children: [
-                  CameraPreview(widget.controller.cameraController!),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: CameraCropGuideline(
-                        cropGuideLineType: widget.controller.cropGuidelineType,
-                        cropAreaItem: widget.controller.cropAreaItem,
-                        radius: widget.controller.guidelineRadius,
-                        backgroundColor: widget.guideLineBackgroundColor ??
-                            Colors.black.withAlpha(180)),
-                  ),
-                ],
+              return GestureDetector(
+                onScaleStart: (details) {
+                  _previousScale = _scale;
+                },
+                onScaleUpdate: (details) {
+                  final scale = _previousScale * details.scale;
+                  if (scale < 1) {
+                    _scale = 1.0;
+                  } else if (scale > 5) {
+                    _scale = 5.0;
+                  } else {
+                    _scale = scale;
+                  }
+                  widget.controller.setCameraZoom(_scale);
+                },
+                onScaleEnd: (details) {
+                  _previousScale = 1.0;
+                },
+                child: Stack(
+                  children: [
+                    CameraPreview(widget.controller.cameraController!),
+                    SizedBox(
+                      width: width,
+                      height: height,
+                      child: CameraCropGuideline(
+                          cropGuideLineType:
+                              widget.controller.cropGuidelineType,
+                          cropAreaItem: widget.controller.cropAreaItem,
+                          radius: widget.controller.guidelineRadius,
+                          backgroundColor: widget.guideLineBackgroundColor ??
+                              Colors.black.withAlpha(180)),
+                    ),
+                  ],
+                ),
               );
             },
           );
