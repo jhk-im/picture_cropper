@@ -250,6 +250,14 @@ class PictureCropperController extends ChangeNotifier {
     if (!isInitial) notifyListeners();
   }
 
+  /// Check camera pinch zoom
+  static bool _isPinchZoom = false;
+  bool get isPinchZoom => _isPinchZoom;
+
+  void setIsPinchZoom(bool value) {
+    _isPinchZoom = value;
+  }
+
   Future<void> setCameraZoom(double level) async {
     await cameraController?.setZoomLevel(level);
   }

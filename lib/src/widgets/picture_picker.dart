@@ -82,6 +82,7 @@ class _PicturePickerState extends State<PicturePicker> {
 
               return GestureDetector(
                 onScaleStart: (details) {
+                  widget.controller.setIsPinchZoom(true);
                   _previousScale = _scale;
                 },
                 onScaleUpdate: (details) {
@@ -96,6 +97,7 @@ class _PicturePickerState extends State<PicturePicker> {
                   widget.controller.setCameraZoom(_scale);
                 },
                 onScaleEnd: (details) {
+                  widget.controller.setIsPinchZoom(false);
                   _previousScale = 1.0;
                 },
                 child: Stack(

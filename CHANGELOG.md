@@ -1,3 +1,6 @@
+## 0.1.13
+- Add camera pinch zoom status
+
 ## 0.1.12
 - Add camera pinch zoom
 
