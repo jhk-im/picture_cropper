@@ -197,6 +197,12 @@ class PictureCropperController extends ChangeNotifier {
     }
   }
 
+  /// This method is used to set images from user image in [PicturePicker].
+  void setOriginalImageBytes(Uint8List bytes) async {
+    _originalImageBytes = bytes;
+    setOriginalImage();
+  }
+
   /// [CropGuideLineType] includes four types: qr, v-card, h-card, clear.
   CropGuideLineType _cropGuidelineType = CropGuideLineType.qr;
   CropGuideLineType get cropGuidelineType => _cropGuidelineType;
