@@ -1,3 +1,6 @@
+## 0.1.15
+- Add method for setGalleryCropAreaItem in controller
+
 ## 0.1.14
 - Add method for setOriginalImageBytes in controller
 

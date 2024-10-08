@@ -48,25 +48,24 @@ class _CropImagePageState extends State<CropImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
             Center(
               child: Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.black,
+                color: Colors.white10,
                 width: double.maxFinite,
-                height: 300,
+                height: 500,
                 child: RawImage(
                   image: widget.image,
                   fit: BoxFit.contain,
                 ),
               ),
             ),
-            Container(
-              alignment: Alignment.topCenter,
-              padding: const EdgeInsets.all(24),
-              height: 80,
+            Padding(
+              padding: const EdgeInsets.all(12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,7 +75,7 @@ class _CropImagePageState extends State<CropImagePage> {
                     },
                     child: const Icon(
                       Icons.arrow_back,
-                      color: Colors.black,
+                      color: Colors.white,
                       size: 32,
                     ),
                   ),
@@ -84,6 +83,7 @@ class _CropImagePageState extends State<CropImagePage> {
                     onTap: saveImage,
                     child: const Icon(
                       Icons.file_download,
+                      color: Colors.white,
                       size: 32,
                     ),
                   ),
@@ -104,10 +104,10 @@ class _CropImagePageState extends State<CropImagePage> {
                       child: Container(
                         width: 68,
                         height: 68,
-                        color: Colors.black,
+                        color: Colors.white,
                         child: const Icon(
                           Icons.camera_alt,
-                          color: Colors.white,
+                          color: Colors.black,
                           size: 32,
                         ),
                       ),

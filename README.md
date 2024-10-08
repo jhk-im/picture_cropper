@@ -5,22 +5,29 @@
 
 A Flutter package for cropping pictures, which includes features for capturing images from the camera or selecting images from the gallery.
 
-Crop & Editor
+Take Picture
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_01.gif?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_02.gif?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/shoot1.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/shoot2.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/shoot3.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/shoot4.png?raw=true" width="200" height="400"/>
 </p>
 
-Irregular Crop
+Editor
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_02.png?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_03.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/edit1.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/edit2.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/edit3.png?raw=true" width="200" height="400"/>
 </p>
 
-Rectangle Crop
+Crop
 <p>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_04.png?raw=true" width="200" height="400"/>
-  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/readme_05.png?raw=true" width="200" height="400"/>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/crop.png?raw=true" width="200" height="400"/>
+</p>
+
+Gallery
+<p>
+  <img src="https://github.com/jhk-im/picture_cropper/blob/main/readme/gallery.png?raw=true" width="200" height="400"/>
 </p>
 
 ## Installation
@@ -111,9 +118,8 @@ InkWell(
 ),
 
 /// Method - takePicture
-/// default isAndroidShootSound = true(optional)
 InkWell(
-  onTap: pictureEditorController.takePicture(isAndroidShootSound: true)
+  onTap: pictureEditorController.takePicture
   child: const Icon(
     Icons.photo,
     color: Colors.white,

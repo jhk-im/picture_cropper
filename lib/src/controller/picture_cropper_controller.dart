@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:image/image.dart' as img;
 import 'package:exif/exif.dart';
 
@@ -23,6 +24,9 @@ class PictureCropperController extends ChangeNotifier {
       initializeControllerFuture = _initializeCamera();
     } else {
       resetEditorData();
+      if (!isTakePicture) {
+        _setGalleryCropAreaItem();
+      }
     }
   }
 
@@ -129,13 +133,10 @@ class PictureCropperController extends ChangeNotifier {
   }
 
   /// This method is used for taking pictures in [PicturePicker].
-  Future<void> takePicture(
-      {bool isAndroidSound = true, bool isNotifyListeners = true}) async {
+  Future<void> takePicture() async {
     if (_cameraController == null || !_cameraController!.value.isInitialized) {
       return;
     }
-
-    if (Platform.isAndroid && isAndroidSound) AndroidShootSound.play();
 
     try {
       final image = await _cameraController!.takePicture();
@@ -147,7 +148,7 @@ class PictureCropperController extends ChangeNotifier {
       final bytes = await newImage.readAsBytes();
       _originalImageBytes = bytes;
       _isTakePicture = true;
-      if (isNotifyListeners) setOriginalImage();
+      setOriginalImage();
     } catch (e) {
       print(e);
     }
@@ -171,6 +172,7 @@ class PictureCropperController extends ChangeNotifier {
         _originalImageBytes = bytes;
       }
       _isTakePicture = false;
+      changeCropGuidelineType(CropGuideLineType.clear);
       setOriginalImage();
       await _deleteImageAndDirectory(pickedFile);
     }
@@ -236,10 +238,10 @@ class PictureCropperController extends ChangeNotifier {
         top = (renderBoxHeight - shortLine) / 2;
         bottom = top + shortLine;
       default:
-        left = _guidelineMargin;
-        right = renderBoxWidth - _guidelineMargin;
-        top = _guidelineMargin;
-        bottom = renderBoxHeight - _guidelineMargin;
+        left = 5;
+        right = renderBoxWidth - 5;
+        top = 5;
+        bottom = renderBoxHeight - 5;
     }
 
     _cropAreaItem = CropAreaItem(
@@ -260,16 +262,17 @@ class PictureCropperController extends ChangeNotifier {
   static bool _isPinchZoom = false;
   bool get isPinchZoom => _isPinchZoom;
 
+  /// This method changes the pinchZoom in [PicturePicker].
   void setIsPinchZoom(bool value) {
     _isPinchZoom = value;
   }
 
+  /// This method changes the cameraZoom in [PicturePicker].
   Future<void> setCameraZoom(double level) async {
     await cameraController?.setZoomLevel(level);
   }
 
   /// [PictureEditor]-----------------------------------------------------------
-
   /// Edit image scale in [PictureEditor]
   double _editImageScale = 1.0;
   double get editImageScale => _editImageScale;
@@ -513,6 +516,49 @@ class PictureCropperController extends ChangeNotifier {
       rightBottomY: rightBottomY,
       leftBottomX: leftBottomX,
       leftBottomY: leftBottomY,
+    );
+    notifyListeners();
+  }
+
+  /// This method is used to set crop area from gallery image in [PictureEditor].
+  void _setGalleryCropAreaItem() async {
+    ui.Image image = await decodeImageFromList(_originalImageBytes);
+
+    double imageWidth = image.width.toDouble();
+    double imageHeight = image.height.toDouble();
+
+    double imageAspectRatio = imageWidth / imageHeight;
+    double boxAspectRatio = renderBoxWidth / renderBoxHeight;
+
+    double scaledImageWidth, scaledImageHeight;
+    double left = 0, right = 0, top = 0, bottom = 0;
+    double margin = 2.5;
+
+    if (imageAspectRatio > boxAspectRatio) {
+      scaledImageWidth = renderBoxWidth;
+      scaledImageHeight = renderBoxWidth / imageAspectRatio;
+      top = (renderBoxHeight - scaledImageHeight) / 2 + margin;
+      bottom = top + scaledImageHeight - (margin * 2);
+      left = margin;
+      right = renderBoxWidth - margin;
+    } else {
+      scaledImageHeight = renderBoxHeight;
+      scaledImageWidth = renderBoxHeight * imageAspectRatio;
+      left = (renderBoxWidth - scaledImageWidth) / 2 + margin;
+      right = left + scaledImageWidth - (margin * 2);
+      top = margin;
+      bottom = renderBoxHeight - margin;
+    }
+
+    _cropAreaItem = CropAreaItem(
+      leftTopX: left,
+      leftTopY: top,
+      rightTopX: right,
+      rightTopY: top,
+      rightBottomX: right,
+      rightBottomY: bottom,
+      leftBottomX: left,
+      leftBottomY: bottom,
     );
     notifyListeners();
   }

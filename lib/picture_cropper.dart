@@ -1,6 +1,5 @@
 library;
 
-export 'src/android/android_shoot_sound.dart';
 export 'src/common/enums.dart';
 
 export 'src/controller/picture_cropper_controller.dart';
