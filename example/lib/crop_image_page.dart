@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class CropImagePage extends StatefulWidget {
@@ -16,7 +17,16 @@ class CropImagePage extends StatefulWidget {
 }
 
 class _CropImagePageState extends State<CropImagePage> {
-  Future<void> saveImage() async {
+  final logger = Logger();
+  bool _isLoading = false;
+
+  void isLoading(bool value) {
+    _isLoading = value;
+    setState(() {});
+  }
+
+  Future<void> saveImage(BuildContext ctx) async {
+    isLoading(true);
     try {
       final ByteData? byteData =
           await widget.image.toByteData(format: ui.ImageByteFormat.png);
@@ -37,12 +47,13 @@ class _CropImagePageState extends State<CropImagePage> {
       );
 
       // Find the ScaffoldMessenger in the widget tree and use it to show a SnackBar.
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if (ctx.mounted) {
+        ScaffoldMessenger.of(ctx).showSnackBar(snackBar);
       }
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
+    isLoading(false);
   }
 
   @override
@@ -80,7 +91,9 @@ class _CropImagePageState extends State<CropImagePage> {
                     ),
                   ),
                   InkWell(
-                    onTap: saveImage,
+                    onTap: () {
+                      saveImage(context);
+                    },
                     child: const Icon(
                       Icons.file_download,
                       color: Colors.white,
@@ -114,6 +127,27 @@ class _CropImagePageState extends State<CropImagePage> {
                     ),
                   ),
                 ),
+              ),
+            ),
+            Visibility(
+              visible: _isLoading,
+              child: Stack(
+                children: <Widget>[
+                  Opacity(
+                    opacity: 0.5,
+                    child: Container(
+                      color: Colors.black,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 16),
+                    child: Center(
+                      child: CircularProgressIndicator(color: Colors.blue),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
